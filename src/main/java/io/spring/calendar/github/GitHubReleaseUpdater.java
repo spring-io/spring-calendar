@@ -16,6 +16,7 @@
 
 package io.spring.calendar.github;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,20 +38,20 @@ import io.spring.calendar.release.ReleaseRepository;
 @Component
 class GitHubReleaseUpdater {
 
-	private final GitHubProjectRepository orojectRepository;
+	private final GitHubProjectRepository projectRepository;
 
 	private final ReleaseRepository releaseRepository;
 
 	GitHubReleaseUpdater(GitHubProjectRepository orojectRepository,
 			ReleaseRepository releaseRepository) {
-		this.orojectRepository = orojectRepository;
+		this.projectRepository = orojectRepository;
 		this.releaseRepository = releaseRepository;
 	}
 
-	@Scheduled(fixedRate = 10000)
+	@Scheduled(fixedRate = 60 * 60 * 1000)
 	@Transactional
 	public void updateReleases() {
-		this.orojectRepository.findAll().forEach(this::updateReleases);
+		this.projectRepository.findAll().forEach(this::updateReleases);
 	}
 
 	private void updateReleases(GitHubProject project) {
@@ -62,7 +63,9 @@ class GitHubReleaseUpdater {
 					return milestone.getDueOn() != null;
 				}).map((Milestone milestone) -> {
 					return new Release(project.getName(), milestone.getTitle(),
-							milestone.getDueOn().toEpochSecond() * 1000);
+							milestone.getDueOn()
+									.withZoneSameInstant(ZoneId.systemDefault())
+									.toEpochSecond() * 1000);
 				}).collect(Collectors.toList());
 		this.releaseRepository.deleteAllByProject(project.getName());
 		this.releaseRepository.save(releases);

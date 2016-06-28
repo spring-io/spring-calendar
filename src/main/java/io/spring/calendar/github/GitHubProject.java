@@ -26,7 +26,7 @@ import javax.persistence.Id;
  * @author Andy Wilkinson
  */
 @Entity
-public class GitHubProject {
+class GitHubProject {
 
 	@Id
 	@GeneratedValue
