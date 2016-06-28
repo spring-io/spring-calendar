@@ -1,0 +1,51 @@
+buildscript {
+	repositories {
+		maven { url 'https://repo.spring.io/libs-milestone' }
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.M3")
+	}
+}
+
+repositories {
+	maven { url 'https://repo.spring.io/libs-milestone' }
+	mavenCentral()
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: 'checkstyle'
+
+jar {
+	baseName = 'spring-calendar'
+	version = '0.1.0.BUILD-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+	compile 'org.springframework.boot:spring-boot-starter-web'
+	runtime 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	runtime 'com.h2database:h2'
+	runtime 'org.flywaydb:flyway-core'
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+checkstyle {
+	configFile = file('config/checkstyle/checkstyle.xml')
+	configProperties = [ 'checkstyle.config.dir' : file('config/checkstyle') ]
+	toolVersion = '6.10.1'
+}
+
+eclipseJdt {
+	inputFile = rootProject.file('config/eclipse/org.eclipse.jdt.core.prefs')
+	doLast {
+		project.file('.settings/org.eclipse.jdt.ui.prefs').withWriter { writer ->
+			writer << rootProject.file('config/eclipse/org.eclipse.jdt.ui.prefs').text
+		}
+	}
+}
