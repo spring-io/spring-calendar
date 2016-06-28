@@ -49,7 +49,7 @@ class ReleaseEventsController {
 			Map<String, Object> event = new HashMap<>();
 			event.put("title", release.getProject() + " " + release.getName());
 			event.put("allDay", true);
-			event.put("start", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+			event.put("start", new SimpleDateFormat("yyyy-MM-dd")
 					.format(new Date(release.getDate())));
 			return event;
 		}).collect(Collectors.toList());
