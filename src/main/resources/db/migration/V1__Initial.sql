@@ -19,9 +19,13 @@ create table release (
 );
 
 insert into git_hub_project(name, owner, repo) values('Spring Boot', 'spring-projects', 'spring-boot');
+insert into git_hub_project(name, owner, repo) values('Spring LDAP', 'spring-projects', 'spring-ldap');
 insert into git_hub_project(name, owner, repo) values('Spring REST Docs', 'spring-projects', 'spring-restdocs');
 insert into git_hub_project(name, owner, repo) values('Spring Security', 'spring-projects', 'spring-security');
 insert into git_hub_project(name, owner, repo) values('Spring Session', 'spring-projects', 'spring-session');
 
+insert into jira_project(name, key) values('Spring AMQP', 'AMQP');
+insert into jira_project(name, key) values('Spring Batch', 'BATCH');
 insert into jira_project(name, key) values('Spring Framework', 'SPR');
 insert into jira_project(name, key) values('Spring Integration', 'INT');
+insert into jira_project(name, key) values('Spring Web Flow', 'SWF');
