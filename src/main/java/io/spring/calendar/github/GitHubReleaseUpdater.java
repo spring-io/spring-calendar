@@ -75,7 +75,7 @@ class GitHubReleaseUpdater {
 			return milestone.getDueOn() != null;
 		}).map((Milestone milestone) -> {
 			return new Release(project.getName(), milestone.getTitle(),
-					milestone.getDueOn().withZoneSameInstant(ZoneId.systemDefault())
+					milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
 							.toEpochSecond() * 1000);
 		}).collect(Collectors.toList());
 		this.releaseRepository.deleteAllByProject(project.getName());
