@@ -17,15 +17,15 @@
 package io.spring.calendar.github;
 
 import java.time.ZoneId;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.ReleaseRepository;
@@ -38,37 +38,57 @@ import io.spring.calendar.release.ReleaseRepository;
 @Component
 class GitHubReleaseUpdater {
 
+	private final Map<String, String> eTags = new HashMap<String, String>();
+
+	private final GitHubOperations gitHub;
+
 	private final GitHubProjectRepository projectRepository;
 
 	private final ReleaseRepository releaseRepository;
 
-	GitHubReleaseUpdater(GitHubProjectRepository orojectRepository,
+	GitHubReleaseUpdater(GitHubOperations gitHub,
+			GitHubProjectRepository projectRepository,
 			ReleaseRepository releaseRepository) {
-		this.projectRepository = orojectRepository;
+		this.gitHub = gitHub;
+		this.projectRepository = projectRepository;
 		this.releaseRepository = releaseRepository;
 	}
 
-	@Scheduled(fixedRate = 60 * 60 * 1000)
+	@Scheduled(fixedRate = 5000)
 	@Transactional
 	public void updateReleases() {
 		this.projectRepository.findAll().forEach(this::updateReleases);
 	}
 
 	private void updateReleases(GitHubProject project) {
-		ResponseEntity<Milestone[]> entity = new RestTemplate()
-				.getForEntity("https://api.github.com/repos/" + project.getOwner() + "/"
-						+ project.getRepo() + "/milestones", Milestone[].class);
-		List<Release> releases = Arrays.asList(entity.getBody()).stream()
-				.filter((milestone) -> {
-					return milestone.getDueOn() != null;
-				}).map((Milestone milestone) -> {
-					return new Release(project.getName(), milestone.getTitle(),
-							milestone.getDueOn()
-									.withZoneSameInstant(ZoneId.systemDefault())
-									.toEpochSecond() * 1000);
-				}).collect(Collectors.toList());
+		String key = project.getOwner() + "/" + project.getRepo();
+		Page<Milestone> page = this.gitHub.getMilestones(project.getOwner(),
+				project.getRepo(), this.eTags.get(key));
+		if (page != null) {
+			this.eTags.put(key, page.getETag());
+			updateReleases(project, page);
+		}
+	}
+
+	private void updateReleases(GitHubProject project, Page<Milestone> page) {
+		List<Release> releases = collectContent(page).stream().filter((milestone) -> {
+			return milestone.getDueOn() != null;
+		}).map((Milestone milestone) -> {
+			return new Release(project.getName(), milestone.getTitle(),
+					milestone.getDueOn().withZoneSameInstant(ZoneId.systemDefault())
+							.toEpochSecond() * 1000);
+		}).collect(Collectors.toList());
 		this.releaseRepository.deleteAllByProject(project.getName());
 		this.releaseRepository.save(releases);
+	}
+
+	private <T> List<T> collectContent(Page<T> page) {
+		List<T> content = new ArrayList<T>();
+		while (page != null) {
+			content.addAll(page.getContent());
+			page = page.next();
+		}
+		return content;
 	}
 
 }
