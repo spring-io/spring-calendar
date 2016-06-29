@@ -92,7 +92,7 @@ public class GitHubTemplate implements GitHubOperations {
 	public Page<Milestone> getMilestones(String organization, String repository,
 			String eTag) {
 		String url = "https://api.github.com/repos/" + organization + "/" + repository
-				+ "/milestones?state=all";
+				+ "/milestones?state=all&per_page=100";
 		return getPage(url, Milestone[].class);
 	}
 
