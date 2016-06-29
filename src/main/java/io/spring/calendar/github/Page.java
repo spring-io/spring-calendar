@@ -40,11 +40,4 @@ public interface Page<T> {
 	 */
 	List<T> getContent();
 
-	/**
-	 * The {@code ETag} of the page, if any.
-	 *
-	 * @return the Etag or {@code null}
-	 */
-	String getETag();
-
 }

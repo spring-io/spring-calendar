@@ -55,7 +55,7 @@ class GitHubReleaseUpdater {
 		this.releaseRepository = releaseRepository;
 	}
 
-	@Scheduled(fixedRate = 5000)
+	@Scheduled(fixedRate = 5 * 60 * 1000)
 	@Transactional
 	public void updateReleases() {
 		this.projectRepository.findAll().forEach(this::updateReleases);
@@ -65,10 +65,7 @@ class GitHubReleaseUpdater {
 		String key = project.getOwner() + "/" + project.getRepo();
 		Page<Milestone> page = this.gitHub.getMilestones(project.getOwner(),
 				project.getRepo(), this.eTags.get(key));
-		if (page != null) {
-			this.eTags.put(key, page.getETag());
-			updateReleases(project, page);
-		}
+		updateReleases(project, page);
 	}
 
 	private void updateReleases(GitHubProject project, Page<Milestone> page) {

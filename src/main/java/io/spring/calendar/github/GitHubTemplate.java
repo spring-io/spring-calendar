@@ -22,9 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -96,26 +93,16 @@ public class GitHubTemplate implements GitHubOperations {
 			String eTag) {
 		String url = "https://api.github.com/repos/" + organization + "/" + repository
 				+ "/milestones?state=all";
-		return getPage(url, Milestone[].class, eTag);
+		return getPage(url, Milestone[].class);
 	}
 
-	private <T> Page<T> getPage(String url, Class<T[]> type, String eTag) {
+	private <T> Page<T> getPage(String url, Class<T[]> type) {
 		if (!StringUtils.hasText(url)) {
 			return null;
 		}
-		HttpHeaders headers = new HttpHeaders();
-		if (StringUtils.hasText(eTag)) {
-			headers.setIfNoneMatch(eTag);
-		}
-		HttpEntity<Void> entity = new HttpEntity<>(headers);
-		ResponseEntity<T[]> response = this.rest.exchange(url, HttpMethod.GET, entity,
-				type);
-		if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
-			return null;
-		}
+		ResponseEntity<T[]> response = this.rest.getForEntity(url, type);
 		return new StandardPage<T>(Arrays.asList(response.getBody()),
-				response.getHeaders().getETag(),
-				() -> getPage(getNextUrl(response), type, null));
+				() -> getPage(getNextUrl(response), type));
 	}
 
 	private String getNextUrl(ResponseEntity<?> response) {

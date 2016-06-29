@@ -29,22 +29,18 @@ public class StandardPage<T> implements Page<T> {
 
 	private List<T> content;
 
-	private final String eTag;
-
 	private Supplier<Page<T>> nextSupplier;
 
 	/**
 	 * Creates a new {@code StandardPage} that has the given {@code content}. The given
-	 * {@code nextSupplier} will be used to obtain the next page {@link #next when
+	 * {@code nextSupplier} will be used to obtain the next page {@link #next} when
 	 * requested}.
 	 *
 	 * @param content the content
-	 * @param eTag the ETag of the page
 	 * @param nextSupplier the supplier of the next page
 	 */
-	public StandardPage(List<T> content, String eTag, Supplier<Page<T>> nextSupplier) {
+	public StandardPage(List<T> content, Supplier<Page<T>> nextSupplier) {
 		this.content = content;
-		this.eTag = eTag;
 		this.nextSupplier = nextSupplier;
 	}
 
@@ -56,11 +52,6 @@ public class StandardPage<T> implements Page<T> {
 	@Override
 	public List<T> getContent() {
 		return this.content;
-	}
-
-	@Override
-	public String getETag() {
-		return this.eTag;
 	}
 
 }
