@@ -36,7 +36,7 @@ public class Release {
 
 	private String name;
 
-	private long date;
+	private String date;
 
 	Release() {
 
@@ -47,9 +47,9 @@ public class Release {
 	 *
 	 * @param project the project
 	 * @param name the name of the release
-	 * @param date the date of the release
+	 * @param date the date of the release (yyyy-mm-dd)
 	 */
-	public Release(String project, String name, long date) {
+	public Release(String project, String name, String date) {
 		this.project = project;
 		this.name = name;
 		this.date = date;
@@ -67,7 +67,7 @@ public class Release {
 		return this.name;
 	}
 
-	long getDate() {
+	String getDate() {
 		return this.date;
 	}
 

@@ -16,8 +16,6 @@
 
 package io.spring.calendar.release;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +47,7 @@ class ReleaseEventsController {
 			Map<String, Object> event = new HashMap<>();
 			event.put("title", release.getProject() + " " + release.getName());
 			event.put("allDay", true);
-			event.put("start", new SimpleDateFormat("yyyy-MM-dd")
-					.format(new Date(release.getDate())));
+			event.put("start", release.getDate());
 			return event;
 		}).collect(Collectors.toList());
 	}

@@ -15,7 +15,7 @@ create table release (
 	id serial not null primary key,
 	project character varying(255) not null,
 	name character varying(255) not null,
-	date bigint not null
+	date character(10) not null
 );
 
 insert into git_hub_project(name, owner, repo) values('Spring Boot', 'spring-projects', 'spring-boot');

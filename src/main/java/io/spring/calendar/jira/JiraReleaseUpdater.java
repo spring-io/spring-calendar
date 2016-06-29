@@ -16,7 +16,6 @@
 
 package io.spring.calendar.jira;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,8 +63,7 @@ class JiraReleaseUpdater {
 				}).map((Version version) -> {
 					try {
 						return new Release(project.getName(), version.getName(),
-								new SimpleDateFormat("yyyy-MM-dd")
-										.parse(version.getReleaseDate()).getTime());
+								version.getReleaseDate());
 					}
 					catch (Exception ex) {
 						throw new IllegalStateException(

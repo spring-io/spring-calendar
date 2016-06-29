@@ -17,6 +17,7 @@
 package io.spring.calendar.github;
 
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ class GitHubReleaseUpdater {
 		}).map((Milestone milestone) -> {
 			return new Release(project.getName(), milestone.getTitle(),
 					milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
-							.toEpochSecond() * 1000);
+							.format(DateTimeFormatter.ISO_LOCAL_DATE));
 		}).collect(Collectors.toList());
 		this.releaseRepository.deleteAllByProject(project.getName());
 		this.releaseRepository.save(releases);
