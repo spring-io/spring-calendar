@@ -16,7 +16,9 @@
 
 package io.spring.calendar.release;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -49,13 +51,21 @@ class ReleaseUpdater {
 	@Scheduled(fixedRate = 60 * 60 * 1000)
 	public void updateReleases() {
 		log.info("Updating releases");
+		Map<String, ProjectReleases> releasesByProject = new HashMap<>();
 		this.projectReleasesSuppliers //
 				.stream() //
 				.map((supplier) -> {
 					return supplier.get();
 				}).flatMap((list) -> {
 					return list.stream();
-				}).forEach(this::updateReleases);
+				}).forEach((projectReleases) -> {
+					ProjectReleases existing = releasesByProject
+							.putIfAbsent(projectReleases.getProject(), projectReleases);
+					if (existing != null) {
+						existing.getReleases().addAll(projectReleases.getReleases());
+					}
+				});
+		releasesByProject.values().forEach(this::updateReleases);
 		log.info("Releases updated");
 	}
 
