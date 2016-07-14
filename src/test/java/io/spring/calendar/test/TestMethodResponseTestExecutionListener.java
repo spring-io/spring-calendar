@@ -35,8 +35,8 @@ public final class TestMethodResponseTestExecutionListener
 	@Override
 	public void beforeTestClass(TestContext testContext) throws Exception {
 		((ConfigurableBeanFactory) testContext.getApplicationContext()
-				.getAutowireCapableBeanFactory()).registerSingleton("jsonResponseCreator",
-						this.testMethodResponseCreator);
+				.getAutowireCapableBeanFactory()).registerSingleton(
+						"testMethodResponseCreator", this.testMethodResponseCreator);
 	}
 
 	@Override
