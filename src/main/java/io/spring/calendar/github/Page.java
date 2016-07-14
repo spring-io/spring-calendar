@@ -24,7 +24,7 @@ import java.util.List;
  * @param <T> the type of the contents of the page
  * @author Andy Wilkinson
  */
-public interface Page<T> {
+interface Page<T> {
 
 	/**
 	 * Returns the next page, if any.

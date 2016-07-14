@@ -22,62 +22,55 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
+import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
-import io.spring.calendar.release.ReleaseRepository;
 
 /**
- * Updates releases for projects managed in GitHub.
+ * A {@link Supplier} of {@link ProjectReleases} for {@link GitHubProject GitHubProjects}.
  *
  * @author Andy Wilkinson
  */
 @Component
-class GitHubReleaseUpdater {
+class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
 	private final Map<String, String> eTags = new HashMap<String, String>();
 
+	private final GitHubProjectRepository repository;
+
 	private final GitHubOperations gitHub;
 
-	private final GitHubProjectRepository projectRepository;
-
-	private final ReleaseRepository releaseRepository;
-
-	GitHubReleaseUpdater(GitHubOperations gitHub,
-			GitHubProjectRepository projectRepository,
-			ReleaseRepository releaseRepository) {
+	GitHubProjectReleasesSupplier(GitHubProjectRepository repository,
+			GitHubOperations gitHub) {
+		this.repository = repository;
 		this.gitHub = gitHub;
-		this.projectRepository = projectRepository;
-		this.releaseRepository = releaseRepository;
 	}
 
-	@Scheduled(fixedRate = 5 * 60 * 1000)
-	@Transactional
-	public void updateReleases() {
-		this.projectRepository.findAll().forEach(this::updateReleases);
+	@Override
+	public List<ProjectReleases> get() {
+		return this.repository.findAll().stream().map(this::createProjectReleases)
+				.collect(Collectors.toList());
 	}
 
-	private void updateReleases(GitHubProject project) {
+	private ProjectReleases createProjectReleases(GitHubProject project) {
 		String key = project.getOwner() + "/" + project.getRepo();
 		Page<Milestone> page = this.gitHub.getMilestones(project.getOwner(),
 				project.getRepo(), this.eTags.get(key));
-		updateReleases(project, page);
+		return new ProjectReleases(project.getName(), getReleases(project, page));
 	}
 
-	private void updateReleases(GitHubProject project, Page<Milestone> page) {
-		List<Release> releases = collectContent(page).stream().filter((milestone) -> {
-			return milestone.getDueOn() != null;
-		}).map((Milestone milestone) -> {
-			return new Release(project.getName(), milestone.getTitle(),
-					milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
-							.format(DateTimeFormatter.ISO_LOCAL_DATE));
-		}).collect(Collectors.toList());
-		this.releaseRepository.deleteAllByProject(project.getName());
-		this.releaseRepository.save(releases);
+	private List<Release> getReleases(GitHubProject project, Page<Milestone> page) {
+		return collectContent(page)//
+				.stream() //
+				.filter(this::hasReleaseDate) //
+				.map((Milestone milestone) -> {
+					return createRelease(project, milestone);
+				}) //
+				.collect(Collectors.toList());
 	}
 
 	private <T> List<T> collectContent(Page<T> page) {
@@ -87,6 +80,16 @@ class GitHubReleaseUpdater {
 			page = page.next();
 		}
 		return content;
+	}
+
+	private boolean hasReleaseDate(Milestone milestone) {
+		return milestone.getDueOn() != null;
+	}
+
+	private Release createRelease(GitHubProject project, Milestone milestone) {
+		return new Release(project.getName(), milestone.getTitle(),
+				milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
+						.format(DateTimeFormatter.ISO_LOCAL_DATE));
 	}
 
 }

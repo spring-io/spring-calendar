@@ -21,7 +21,7 @@ package io.spring.calendar.github;
  *
  * @author Andy Wilkinson
  */
-public interface GitHubOperations {
+interface GitHubOperations {
 
 	/**
 	 * Returns the milestones in the {@code repository} owned by the given

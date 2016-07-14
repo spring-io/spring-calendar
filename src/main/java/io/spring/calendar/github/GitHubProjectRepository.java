@@ -23,6 +23,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  * @author Andy Wilkinson
  */
-public interface GitHubProjectRepository extends JpaRepository<GitHubProject, Long> {
+interface GitHubProjectRepository extends JpaRepository<GitHubProject, Long> {
 
 }

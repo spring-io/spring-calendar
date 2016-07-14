@@ -23,6 +23,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  * @author Andy Wilkinson
  */
-public interface JiraProjectRepository extends JpaRepository<JiraProject, Long> {
+interface JiraProjectRepository extends JpaRepository<JiraProject, Long> {
 
 }

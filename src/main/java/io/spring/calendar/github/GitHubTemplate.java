@@ -40,7 +40,7 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author Andy Wilkinson
  */
-public class GitHubTemplate implements GitHubOperations {
+class GitHubTemplate implements GitHubOperations {
 
 	private final RestOperations rest;
 
@@ -55,7 +55,7 @@ public class GitHubTemplate implements GitHubOperations {
 	 * @param password the password
 	 * @param linkParser the link parser
 	 */
-	public GitHubTemplate(String username, String password, LinkParser linkParser) {
+	GitHubTemplate(String username, String password, LinkParser linkParser) {
 		this(createDefaultRestTemplate(username, password), linkParser);
 	}
 

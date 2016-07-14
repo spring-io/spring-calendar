@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Andy Wilkinson
  */
-public class RegexLinkParser implements LinkParser {
+class RegexLinkParser implements LinkParser {
 
 	private static final Pattern LINK_PATTERN = Pattern.compile("<(.+)>; rel=\"(.+)\"");
 

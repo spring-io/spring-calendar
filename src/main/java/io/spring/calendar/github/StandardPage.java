@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  * @param <T> the type of the contents of the page
  * @author Andy Wilkinson
  */
-public class StandardPage<T> implements Page<T> {
+class StandardPage<T> implements Page<T> {
 
 	private List<T> content;
 
@@ -39,7 +39,7 @@ public class StandardPage<T> implements Page<T> {
 	 * @param content the content
 	 * @param nextSupplier the supplier of the next page
 	 */
-	public StandardPage(List<T> content, Supplier<Page<T>> nextSupplier) {
+	StandardPage(List<T> content, Supplier<Page<T>> nextSupplier) {
 		this.content = content;
 		this.nextSupplier = nextSupplier;
 	}
