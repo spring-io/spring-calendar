@@ -19,6 +19,8 @@ package io.spring.calendar.release;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 class ReleaseUpdater {
+
+	private static final Logger log = LoggerFactory.getLogger(ReleaseUpdater.class);
 
 	private final List<Supplier<List<ProjectReleases>>> projectReleasesSuppliers;
 
@@ -44,6 +48,7 @@ class ReleaseUpdater {
 	@Transactional
 	@Scheduled(fixedRate = 60 * 60 * 1000)
 	public void updateReleases() {
+		log.info("Updating releases");
 		this.projectReleasesSuppliers //
 				.stream() //
 				.map((supplier) -> {
@@ -51,6 +56,7 @@ class ReleaseUpdater {
 				}).flatMap((list) -> {
 					return list.stream();
 				}).forEach(this::updateReleases);
+		log.info("Releases updated");
 	}
 
 	private void updateReleases(ProjectReleases projectReleases) {

@@ -16,13 +16,28 @@
 
 package io.spring.calendar.jira;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 /**
- * JPA repository for {@link JiraProject JiraProjects}.
+ * Operations that can be performed against JIRA's API.
  *
  * @author Andy Wilkinson
  */
-interface JiraProjectRepository extends JpaRepository<JiraProject, Long> {
+public interface JiraOperations {
+
+	/**
+	 * Returns the {@link JiraProject Projects} in the JIRA instance.
+	 *
+	 * @return the projects
+	 */
+	List<JiraProject> getProjects();
+
+	/**
+	 * Returns the {@link JiraVersion Versions} for the given {@link JiraProject}.
+	 *
+	 * @param project the project
+	 * @return the project's versions
+	 */
+	List<JiraVersion> getVersions(JiraProject project);
 
 }

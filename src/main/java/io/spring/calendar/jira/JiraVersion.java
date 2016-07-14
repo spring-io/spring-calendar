@@ -24,14 +24,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Andy Wilkinson
  */
-class Version {
+class JiraVersion {
 
 	private final String name;
 
 	private final String releaseDate;
 
 	@JsonCreator
-	Version(@JsonProperty("name") String name,
+	JiraVersion(@JsonProperty("name") String name,
 			@JsonProperty("releaseDate") String releaseDate) {
 		this.name = name;
 		this.releaseDate = releaseDate;

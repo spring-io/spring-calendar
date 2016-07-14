@@ -75,7 +75,8 @@
 			<property name="excludes" value="org.assertj.core.api.Assertions.assertThat,
 				org.junit.Assert.*, org.junit.Assume.*, org.hamcrest.CoreMatchers.*,
 				org.hamcrest.Matchers.*, org.mockito.Mockito.*, org.mockito.BDDMockito.*,
-				org.mockito.Matchers.*" />
+				org.mockito.Matchers.*,
+				org.springframework.test.web.client.match.MockRestRequestMatchers.*" />
 		</module>
 		<module name="IllegalImport" />
 		<module name="RedundantImport" />

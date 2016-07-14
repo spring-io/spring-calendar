@@ -5,12 +5,6 @@ create table git_hub_project (
 	repo character varying(255) not null
 );
 
-create table jira_project (
-	id serial not null primary key,
-	name character varying(255) not null,
-	key character varying(255) not null,
-);
-
 create table ical_project (
 	id serial not null primary key,
 	name character varying(255) not null,
@@ -29,11 +23,5 @@ insert into git_hub_project(name, owner, repo) values('Spring LDAP', 'spring-pro
 insert into git_hub_project(name, owner, repo) values('Spring REST Docs', 'spring-projects', 'spring-restdocs');
 insert into git_hub_project(name, owner, repo) values('Spring Security', 'spring-projects', 'spring-security');
 insert into git_hub_project(name, owner, repo) values('Spring Session', 'spring-projects', 'spring-session');
-
-insert into jira_project(name, key) values('Spring AMQP', 'AMQP');
-insert into jira_project(name, key) values('Spring Batch', 'BATCH');
-insert into jira_project(name, key) values('Spring Framework', 'SPR');
-insert into jira_project(name, key) values('Spring Integration', 'INT');
-insert into jira_project(name, key) values('Spring Web Flow', 'SWF');
 
 insert into ical_project(name, calendar_url) values('Spring Data', 'https://calendar.google.com/calendar/ical/pivotal.io_r0vuldu3ka36th4dqvldpetcqs%40group.calendar.google.com/public/basic.ics');

@@ -16,40 +16,49 @@
 
 package io.spring.calendar.jira;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import java.net.URI;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A project managed in JIRA.
+ * A minimal representation of a project in a JIRA instance.
  *
  * @author Andy Wilkinson
  */
-@Entity
-class JiraProject {
-
-	@Id
-	@GeneratedValue
-	private long id;
+public class JiraProject {
 
 	private String name;
 
-	private String key;
+	private URI uri;
 
-	JiraProject() {
-
+	/**
+	 * Creates a new project with the given {@code name} and {@code url}.
+	 *
+	 * @param name the project's name
+	 * @param uri the project's URI
+	 */
+	@JsonCreator
+	public JiraProject(@JsonProperty("name") String name, @JsonProperty("self") URI uri) {
+		this.name = name;
+		this.uri = uri;
 	}
 
-	long getId() {
-		return this.id;
-	}
-
-	String getName() {
+	/**
+	 * Returns the name of the project.
+	 *
+	 * @return the project's name
+	 */
+	public String getName() {
 		return this.name;
 	}
 
-	String getKey() {
-		return this.key;
+	/**
+	 * Returns the URI of the project.
+	 * @return the project's URI
+	 */
+	public URI getUri() {
+		return this.uri;
 	}
 
 }

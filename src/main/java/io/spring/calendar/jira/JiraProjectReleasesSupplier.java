@@ -16,39 +16,37 @@
 
 package io.spring.calendar.jira;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Component;
 
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 
 /**
- * A {@link Supplier} of {@link ProjectReleases} for {@link JiraProject JiraProjects}.
+ * A {@link Supplier} of {@link ProjectReleases} for projects managed in JIRA.
  *
  * @author Andy Wilkinson
  */
+@Component
 class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
-	private final JiraProjectRepository repository;
+	private final JiraOperations jiraOperations;
 
-	JiraProjectReleasesSupplier(JiraProjectRepository repository) {
-		this.repository = repository;
+	JiraProjectReleasesSupplier(JiraOperations jiraOperations) {
+		this.jiraOperations = jiraOperations;
 	}
 
 	@Override
 	public List<ProjectReleases> get() {
-		return this.repository.findAll().stream().map(this::createProjectReleases)
+		return this.jiraOperations.getProjects().stream().map(this::createProjectReleases)
 				.collect(Collectors.toList());
 	}
 
 	private ProjectReleases createProjectReleases(JiraProject project) {
-		List<Release> releases = getVersions(project)//
+		List<Release> releases = this.jiraOperations.getVersions(project).stream() //
 				.filter(this::hasReleaseDate) //
 				.map((version) -> {
 					return createRelease(project, version);
@@ -57,18 +55,11 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return new ProjectReleases(project.getName(), releases);
 	}
 
-	private Stream<Version> getVersions(JiraProject project) {
-		ResponseEntity<Version[]> entity = new RestTemplate()
-				.getForEntity("https://jira.spring.io/rest/api/2/project/"
-						+ project.getKey() + "/versions", Version[].class);
-		return Arrays.asList(entity.getBody()).stream();
-	}
-
-	private boolean hasReleaseDate(Version version) {
+	private boolean hasReleaseDate(JiraVersion version) {
 		return version.getReleaseDate() != null;
 	}
 
-	private Release createRelease(JiraProject project, Version version) {
+	private Release createRelease(JiraProject project, JiraVersion version) {
 		try {
 			return new Release(project.getName(), version.getName(),
 					version.getReleaseDate());
