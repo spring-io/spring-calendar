@@ -11,6 +11,12 @@ create table jira_project (
 	key character varying(255) not null,
 );
 
+create table ical_project (
+	id serial not null primary key,
+	name character varying(255) not null,
+	calendar_url character varying(255) not null,
+);
+
 create table release (
 	id serial not null primary key,
 	project character varying(255) not null,
@@ -29,3 +35,5 @@ insert into jira_project(name, key) values('Spring Batch', 'BATCH');
 insert into jira_project(name, key) values('Spring Framework', 'SPR');
 insert into jira_project(name, key) values('Spring Integration', 'INT');
 insert into jira_project(name, key) values('Spring Web Flow', 'SWF');
+
+insert into ical_project(name, calendar_url) values('Spring Data', 'https://calendar.google.com/calendar/ical/pivotal.io_r0vuldu3ka36th4dqvldpetcqs%40group.calendar.google.com/public/basic.ics');
