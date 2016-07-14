@@ -29,10 +29,12 @@ interface GitHubOperations {
 	 *
 	 * @param organization the name of the organization
 	 * @param repository the name of the repository
-	 * @param eTag the ETag of an earlier response, or {@code null}
+	 * @param earlierResponse the first page of an earlier response that can be used to
+	 * perform conditional requests, or {@code null}.
 	 * @return the page of milestones or {@code null} if unmodified based on the
 	 * {@code eTag}
 	 */
-	Page<Milestone> getMilestones(String organization, String repository, String eTag);
+	Page<Milestone> getMilestones(String organization, String repository,
+			Page<Milestone> earlierResponse);
 
 }

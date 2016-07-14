@@ -40,4 +40,16 @@ interface Page<T> {
 	 */
 	List<T> getContent();
 
+	/**
+	 * Returns the URL of the page.
+	 * @return the page's URL
+	 */
+	String getUrl();
+
+	/**
+	 * Returns the etag of the page.
+	 * @return the page's etag
+	 */
+	String getEtag();
+
 }

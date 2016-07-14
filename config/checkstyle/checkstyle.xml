@@ -76,7 +76,8 @@
 				org.junit.Assert.*, org.junit.Assume.*, org.hamcrest.CoreMatchers.*,
 				org.hamcrest.Matchers.*, org.mockito.Mockito.*, org.mockito.BDDMockito.*,
 				org.mockito.Matchers.*,
-				org.springframework.test.web.client.match.MockRestRequestMatchers.*" />
+				org.springframework.test.web.client.match.MockRestRequestMatchers.*,
+				org.springframework.test.web.client.response.MockRestResponseCreators.*" />
 		</module>
 		<module name="IllegalImport" />
 		<module name="RedundantImport" />

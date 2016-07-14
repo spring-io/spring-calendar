@@ -17,19 +17,18 @@
 package io.spring.calendar.github;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.net.URI;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
+import java.util.function.Supplier;
 
-import org.springframework.http.HttpRequest;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestOperations;
@@ -49,87 +48,105 @@ class GitHubTemplate implements GitHubOperations {
 	/**
 	 * Creates a new {@code GitHubTemplate} that will use the given {@code username} and
 	 * {@code password} to authenticate, and the given {@code linkParser} to parse links
-	 * from responses' {@code Link} header.
+	 * from responses' {@code Link} header. It will use a {@link RestTemplate} created
+	 * from the given {@code restTemplateBuilder}.
 	 *
 	 * @param username the username
 	 * @param password the password
 	 * @param linkParser the link parser
+	 * @param restTemplateBuilder the builder
 	 */
-	GitHubTemplate(String username, String password, LinkParser linkParser) {
-		this(createDefaultRestTemplate(username, password), linkParser);
-	}
-
-	GitHubTemplate(RestOperations rest, LinkParser linkParser) {
-		this.rest = rest;
-		this.linkParser = linkParser;
-	}
-
-	static RestTemplate createDefaultRestTemplate(String username, String password) {
-		RestTemplate rest = new RestTemplate();
-		rest.setErrorHandler(new DefaultResponseErrorHandler() {
-			@Override
-			public void handleError(ClientHttpResponse response) throws IOException {
-				if (response.getStatusCode() == HttpStatus.FORBIDDEN && response
-						.getHeaders().getFirst("X-RateLimit-Remaining").equals("0")) {
-					throw new IllegalStateException(
-							"Rate limit exceeded. Limit will reset at "
-									+ new Date(Long
-											.valueOf(response.getHeaders()
-													.getFirst("X-RateLimit-Reset"))
-											* 1000));
-				}
-			}
-		});
-		rest.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+	GitHubTemplate(String username, String password, LinkParser linkParser,
+			RestTemplateBuilder restTemplateBuilder) {
 		if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-			rest.setInterceptors(Collections.singletonList(
-					new BasicAuthorizationInterceptor(username, password)));
+			restTemplateBuilder = restTemplateBuilder.basicAuthorization(username,
+					password);
 		}
-		return rest;
+		this.rest = restTemplateBuilder.additionalCustomizers((restTemplate) -> {
+			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+				@Override
+				public void handleError(ClientHttpResponse response) throws IOException {
+					if (response.getStatusCode() == HttpStatus.FORBIDDEN && response
+							.getHeaders().getFirst("X-RateLimit-Remaining").equals("0")) {
+						throw new IllegalStateException(
+								"Rate limit exceeded. Limit will reset at "
+										+ new Date(Long
+												.valueOf(response.getHeaders()
+														.getFirst("X-RateLimit-Reset"))
+												* 1000));
+					}
+				}
+			});
+		}).build();
+		this.linkParser = linkParser;
 	}
 
 	@Override
 	public Page<Milestone> getMilestones(String organization, String repository,
-			String eTag) {
-		String url = "https://api.github.com/repos/" + organization + "/" + repository
-				+ "/milestones?state=all&per_page=100";
-		return getPage(url, Milestone[].class);
+			Page<Milestone> earlierResponse) {
+		String url = earlierResponse != null ? earlierResponse.getUrl()
+				: "https://api.github.com/repos/" + organization + "/" + repository
+						+ "/milestones?state=all&per_page=100";
+		return new PageSupplier<Milestone>(url, earlierResponse, Milestone[].class).get();
 	}
 
-	private <T> Page<T> getPage(String url, Class<T[]> type) {
-		if (!StringUtils.hasText(url)) {
-			return null;
-		}
-		ResponseEntity<T[]> response = this.rest.getForEntity(url, type);
-		return new StandardPage<T>(Arrays.asList(response.getBody()),
-				() -> getPage(getNextUrl(response), type));
-	}
+	private class PageSupplier<T> implements Supplier<Page<T>> {
 
-	private String getNextUrl(ResponseEntity<?> response) {
-		return this.linkParser.parse(response.getHeaders().getFirst("Link")).get("next");
-	}
+		private String url;
 
-	private static class BasicAuthorizationInterceptor
-			implements ClientHttpRequestInterceptor {
+		private Page<T> page;
 
-		private static final Charset UTF_8 = Charset.forName("UTF-8");
+		private Page<T> earlierResponse;
 
-		private final String username;
+		private Class<T[]> type;
 
-		private final String password;
-
-		BasicAuthorizationInterceptor(String username, String password) {
-			this.username = username;
-			this.password = (password == null ? "" : password);
+		PageSupplier(String url, Page<T> earlierResponse, Class<T[]> type) {
+			this.url = url;
+			this.earlierResponse = earlierResponse;
+			this.type = type;
 		}
 
 		@Override
-		public ClientHttpResponse intercept(HttpRequest request, byte[] body,
-				ClientHttpRequestExecution execution) throws IOException {
-			String token = Base64Utils.encodeToString(
-					(this.username + ":" + this.password).getBytes(UTF_8));
-			request.getHeaders().add("Authorization", "Basic " + token);
-			return execution.execute(request, body);
+		public Page<T> get() {
+			if (this.page == null) {
+				this.page = getPage(this.url, this.type);
+			}
+			return this.page;
+		}
+
+		private Page<T> getPage(String url, Class<T[]> type) {
+			if (!StringUtils.hasText(url)) {
+				return null;
+			}
+			HttpHeaders headers = new HttpHeaders();
+			if (this.earlierResponse != null && (this.earlierResponse.next() != null
+					|| this.earlierResponse.getContent().size() != 100)) {
+				headers.setIfNoneMatch(this.earlierResponse.getEtag());
+			}
+
+			ResponseEntity<T[]> response = GitHubTemplate.this.rest
+					.exchange(new RequestEntity<Void>(headers, HttpMethod.GET,
+							URI.create(this.url)), this.type);
+			if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
+				Page<T> nextEarlierResponse = this.earlierResponse.next();
+				return new StandardPage<T>(this.earlierResponse.getContent(), this.url,
+						this.earlierResponse.getEtag(),
+						new PageSupplier<T>(
+								nextEarlierResponse == null ? null
+										: nextEarlierResponse.getUrl(),
+								nextEarlierResponse, this.type));
+			}
+			else {
+				return new StandardPage<T>(Arrays.asList(response.getBody()), this.url,
+						response.getHeaders().getETag(),
+						new PageSupplier<T>(getNextUrl(response), null, this.type));
+			}
+
+		}
+
+		private String getNextUrl(ResponseEntity<?> response) {
+			return GitHubTemplate.this.linkParser
+					.parse(response.getHeaders().getFirst("Link")).get("next");
 		}
 
 	}

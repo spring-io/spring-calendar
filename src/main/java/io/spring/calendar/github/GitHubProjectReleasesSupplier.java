@@ -38,7 +38,7 @@ import io.spring.calendar.release.Release;
 @Component
 class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
-	private final Map<String, String> eTags = new HashMap<String, String>();
+	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<String, Page<Milestone>>();
 
 	private final GitHubProjectRepository repository;
 
@@ -59,8 +59,10 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private ProjectReleases createProjectReleases(GitHubProject project) {
 		String key = project.getOwner() + "/" + project.getRepo();
 		Page<Milestone> page = this.gitHub.getMilestones(project.getOwner(),
-				project.getRepo(), this.eTags.get(key));
-		return new ProjectReleases(project.getName(), getReleases(project, page));
+				project.getRepo(), this.earlierMilestones.get(key));
+		this.earlierMilestones.put(key, page);
+		List<Release> releases = getReleases(project, page);
+		return new ProjectReleases(project.getName(), releases);
 	}
 
 	private List<Release> getReleases(GitHubProject project, Page<Milestone> page) {

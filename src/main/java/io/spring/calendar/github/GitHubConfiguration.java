@@ -17,6 +17,7 @@
 package io.spring.calendar.github;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,9 +37,10 @@ class GitHubConfiguration {
 	}
 
 	@Bean
-	GitHubOperations gitHubOperations() {
+	GitHubOperations gitHubOperations(RestTemplateBuilder restTemplateBuilder) {
 		return new GitHubTemplate(this.gitHubProperties.getUsername(),
-				this.gitHubProperties.getPassword(), new RegexLinkParser());
+				this.gitHubProperties.getPassword(), new RegexLinkParser(),
+				restTemplateBuilder);
 	}
 
 }
