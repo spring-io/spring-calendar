@@ -35,13 +35,20 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
 	private final JiraOperations jiraOperations;
 
-	JiraProjectReleasesSupplier(JiraOperations jiraOperations) {
+	private final JiraProjectFilter jiraProjectFilter;
+
+	JiraProjectReleasesSupplier(JiraOperations jiraOperations,
+			JiraProjectFilter jiraProjectFilter) {
 		this.jiraOperations = jiraOperations;
+		this.jiraProjectFilter = jiraProjectFilter;
 	}
 
 	@Override
 	public List<ProjectReleases> get() {
-		return this.jiraOperations.getProjects().stream().map(this::createProjectReleases)
+		return this.jiraOperations.getProjects() //
+				.stream() //
+				.filter(this.jiraProjectFilter) //
+				.map(this::createProjectReleases) //
 				.collect(Collectors.toList());
 	}
 
