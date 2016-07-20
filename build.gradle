@@ -28,12 +28,9 @@ targetCompatibility = 1.8
 
 dependencies {
 	compile 'net.sf.biweekly:biweekly:0.4.6'
-	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
 	compile 'org.springframework.boot:spring-boot-starter-web'
 	runtime 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-	runtime 'com.h2database:h2'
 	runtime 'org.apache.httpcomponents:httpclient'
-	runtime 'org.flywaydb:flyway-core'
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 

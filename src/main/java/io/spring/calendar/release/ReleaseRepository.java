@@ -16,20 +16,27 @@
 
 package io.spring.calendar.release;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 /**
- * A {@link JpaRepository} for {@link Release Releases}.
+ * A repository for {@link Release Releases}.
  *
  * @author Andy Wilkinson
  */
-public interface ReleaseRepository extends JpaRepository<Release, Long> {
+public interface ReleaseRepository {
 
 	/**
-	 * Delete all releases for the given {@code projectName}.
+	 * Sets the repository's releases to the given {@code releases}.
 	 *
-	 * @param projectName name of the project
+	 * @param releases the releases
 	 */
-	void deleteAllByProject(String projectName);
+	void set(List<Release> releases);
+
+	/**
+	 * Returns all of the releases known to the repository.
+	 *
+	 * @return the releases
+	 */
+	List<Release> findAll();
 
 }

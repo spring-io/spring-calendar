@@ -20,12 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@code ReleaseUpdater} updates the known {@link Release Releases}.
@@ -47,7 +47,6 @@ class ReleaseUpdater {
 		this.releaseRepository = releaseRepository;
 	}
 
-	@Transactional
 	@Scheduled(fixedRate = 5 * 60 * 1000)
 	public void updateReleases() {
 		log.info("Updating releases");
@@ -65,13 +64,16 @@ class ReleaseUpdater {
 						existing.getReleases().addAll(projectReleases.getReleases());
 					}
 				});
-		releasesByProject.values().forEach(this::updateReleases);
+		List<Release> releases = releasesByProject.values().stream()
+				.flatMap((projectReleases) -> {
+					return projectReleases.getReleases().stream();
+				}).collect(Collectors.toList());
+		updateReleases(releases);
 		log.info("Releases updated");
 	}
 
-	private void updateReleases(ProjectReleases projectReleases) {
-		this.releaseRepository.deleteAllByProject(projectReleases.getProject());
-		this.releaseRepository.save(projectReleases.getReleases());
+	private void updateReleases(List<Release> releases) {
+		this.releaseRepository.set(releases);
 	}
 
 }

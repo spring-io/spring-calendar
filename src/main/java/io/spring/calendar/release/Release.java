@@ -16,31 +16,18 @@
 
 package io.spring.calendar.release;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 /**
  * A release of a project.
  *
  * @author Andy Wilkinson
  */
-@Entity
 public class Release {
 
-	@Id
-	@GeneratedValue
-	private long id;
+	private final String project;
 
-	private String project;
+	private final String name;
 
-	private String name;
-
-	private String date;
-
-	Release() {
-
-	}
+	private final String date;
 
 	/**
 	 * Creates a new {@code Release}.
@@ -53,10 +40,6 @@ public class Release {
 		this.project = project;
 		this.name = name;
 		this.date = date;
-	}
-
-	long getId() {
-		return this.id;
 	}
 
 	String getProject() {

@@ -18,7 +18,10 @@ package io.spring.calendar.ical;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -39,15 +42,11 @@ import io.spring.calendar.release.Release;
 @Component
 class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
-	private final ICalProjectRepository repository;
-
-	ICalProjectReleasesSupplier(ICalProjectRepository repository) {
-		this.repository = repository;
-	}
+	private final List<ICalProject> projects = createProjects();
 
 	@Override
 	public List<ProjectReleases> get() {
-		return this.repository.findAll().stream().map(this::createProjectReleases)
+		return this.projects.stream().map(this::createProjectReleases)
 				.collect(Collectors.toList());
 	}
 
@@ -90,6 +89,16 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		}
 		return new Release(project.getName(), name, new SimpleDateFormat("yyyy-MM-dd")
 				.format(event.getDateStart().getValue()));
+	}
+
+	private static List<ICalProject> createProjects() {
+		try {
+			return Arrays.asList(new ICalProject("Spring Data", new URL(
+					"https://calendar.google.com/calendar/ical/pivotal.io_r0vuldu3ka36th4dqvldpetcqs%40group.calendar.google.com/public/basic.ics")));
+		}
+		catch (MalformedURLException ex) {
+			throw new IllegalStateException();
+		}
 	}
 
 }

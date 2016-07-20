@@ -19,7 +19,6 @@ package io.spring.calendar;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Main class for the Spring Calendar.
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableScheduling
-@EnableTransactionManagement
 public class SpringCalendar {
 
 	public static void main(String[] args) {

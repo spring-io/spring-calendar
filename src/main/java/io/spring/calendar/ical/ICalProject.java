@@ -18,34 +18,20 @@ package io.spring.calendar.ical;
 
 import java.net.URL;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 /**
  * A project available as an iCalendar.
  *
  * @author Andy Wilkinson
  */
-@Entity
-@Table(name = "ical_project")
 class ICalProject {
 
-	@Id
-	@GeneratedValue
-	private long id;
+	private final String name;
 
-	private String name;
+	private final URL calendarUrl;
 
-	private URL calendarUrl;
-
-	ICalProject() {
-
-	}
-
-	long getId() {
-		return this.id;
+	ICalProject(String name, URL calendarUrl) {
+		this.name = name;
+		this.calendarUrl = calendarUrl;
 	}
 
 	String getName() {
