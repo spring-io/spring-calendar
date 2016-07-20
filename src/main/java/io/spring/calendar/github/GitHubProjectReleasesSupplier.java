@@ -19,11 +19,13 @@ package io.spring.calendar.github;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -31,46 +33,57 @@ import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 
 /**
- * A {@link Supplier} of {@link ProjectReleases} for {@link GitHubProject GitHubProjects}.
+ * A {@link Supplier} of {@link ProjectReleases} for projects managed on GitHub.
  *
  * @author Andy Wilkinson
  */
 @Component
 class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
+	private final List<String> organizations = Arrays.asList("spring-cloud",
+			"spring-gradle-plugins", "spring-io", "spring-projects");
+
 	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<String, Page<Milestone>>();
 
-	private final GitHubProjectRepository repository;
+	private final Map<String, Page<Repository>> earlierRepositories = new HashMap<String, Page<Repository>>();
 
 	private final GitHubOperations gitHub;
 
-	GitHubProjectReleasesSupplier(GitHubProjectRepository repository,
-			GitHubOperations gitHub) {
-		this.repository = repository;
+	GitHubProjectReleasesSupplier(GitHubOperations gitHub) {
 		this.gitHub = gitHub;
 	}
 
 	@Override
 	public List<ProjectReleases> get() {
-		return this.repository.findAll().stream().map(this::createProjectReleases)
+		return this.organizations //
+				.stream() //
+				.flatMap(this::getRepositories) //
+				.map(this::createProjectReleases) //
 				.collect(Collectors.toList());
 	}
 
-	private ProjectReleases createProjectReleases(GitHubProject project) {
-		String key = project.getOwner() + "/" + project.getRepo();
-		Page<Milestone> page = this.gitHub.getMilestones(project.getOwner(),
-				project.getRepo(), this.earlierMilestones.get(key));
-		this.earlierMilestones.put(key, page);
-		List<Release> releases = getReleases(project, page);
-		return new ProjectReleases(project.getName(), releases);
+	private Stream<Repository> getRepositories(String organization) {
+		Page<Repository> page = this.gitHub.getPublicRepositories(organization,
+				this.earlierRepositories.get(organization));
+		this.earlierRepositories.put(organization,
+				this.earlierRepositories.get(organization));
+		return collectContent(page).stream();
 	}
 
-	private List<Release> getReleases(GitHubProject project, Page<Milestone> page) {
-		return collectContent(page)//
+	private ProjectReleases createProjectReleases(Repository repository) {
+		Page<Milestone> page = this.gitHub.getMilestones(repository,
+				this.earlierMilestones.get(repository.getMilestonesUrl()));
+		this.earlierMilestones.put(repository.getFullName(), page);
+		List<Release> releases = getReleases(repository, page);
+		return new ProjectReleases(repository.getDisplayName(), releases);
+	}
+
+	private List<Release> getReleases(Repository repository, Page<Milestone> page) {
+		return collectContent(page) //
 				.stream() //
 				.filter(this::hasReleaseDate) //
 				.map((Milestone milestone) -> {
-					return createRelease(project, milestone);
+					return createRelease(repository, milestone);
 				}) //
 				.collect(Collectors.toList());
 	}
@@ -88,8 +101,8 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return milestone.getDueOn() != null;
 	}
 
-	private Release createRelease(GitHubProject project, Milestone milestone) {
-		return new Release(project.getName(), milestone.getTitle(),
+	private Release createRelease(Repository project, Milestone milestone) {
+		return new Release(project.getDisplayName(), milestone.getTitle(),
 				milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
 						.format(DateTimeFormatter.ISO_LOCAL_DATE));
 	}

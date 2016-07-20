@@ -24,17 +24,24 @@ package io.spring.calendar.github;
 interface GitHubOperations {
 
 	/**
-	 * Returns the milestones in the {@code repository} owned by the given
-	 * {@code organization}.
+	 * Returns the milestones in the given {@code repository}.
 	 *
-	 * @param organization the name of the organization
-	 * @param repository the name of the repository
+	 * @param repository the repository
 	 * @param earlierResponse the first page of an earlier response that can be used to
 	 * perform conditional requests, or {@code null}.
-	 * @return the page of milestones or {@code null} if unmodified based on the
-	 * {@code eTag}
+	 * @return the page of milestones
 	 */
-	Page<Milestone> getMilestones(String organization, String repository,
-			Page<Milestone> earlierResponse);
+	Page<Milestone> getMilestones(Repository repository, Page<Milestone> earlierResponse);
+
+	/**
+	 * Returns the public repositories of the given {@code organization}.
+	 *
+	 * @param organization the name of the organization
+	 * @param earlierResponse the first page of an earlier response that can be used to
+	 * perform conditional requests, or {@code null}.
+	 * @return the page of repositories
+	 */
+	Page<Repository> getPublicRepositories(String organization,
+			Page<Repository> earlierResponse);
 
 }

@@ -82,12 +82,20 @@ class GitHubTemplate implements GitHubOperations {
 	}
 
 	@Override
-	public Page<Milestone> getMilestones(String organization, String repository,
+	public Page<Milestone> getMilestones(Repository repository,
 			Page<Milestone> earlierResponse) {
-		String url = earlierResponse != null ? earlierResponse.getUrl()
-				: "https://api.github.com/repos/" + organization + "/" + repository
-						+ "/milestones?state=all&per_page=100";
+		String url = repository.getMilestonesUrl().toString() + "?state=all&per_page=100";
 		return new PageSupplier<Milestone>(url, earlierResponse, Milestone[].class).get();
+	}
+
+	@Override
+	public Page<Repository> getPublicRepositories(String organization,
+			Page<Repository> earlierResponse) {
+		String url = earlierResponse != null ? earlierResponse.getUrl()
+				: "https://api.github.com/orgs/" + organization
+						+ "/repos?type=public&per_page=100";
+		return new PageSupplier<Repository>(url, earlierResponse, Repository[].class)
+				.get();
 	}
 
 	private class PageSupplier<T> implements Supplier<Page<T>> {
