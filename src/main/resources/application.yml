@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+calendar:
+  github:
+    organizations:
+      - spring-cloud
+      - spring-gradle-plugins
+      - spring-io
+      - spring-projects
