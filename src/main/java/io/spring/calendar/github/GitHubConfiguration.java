@@ -43,4 +43,10 @@ class GitHubConfiguration {
 				restTemplateBuilder);
 	}
 
+	@Bean
+	GitHubProjectReleasesSupplier releasesSupplier(GitHubOperations gitHubOperations) {
+		return new GitHubProjectReleasesSupplier(gitHubOperations,
+				this.gitHubProperties.getOrganizations());
+	}
+
 }

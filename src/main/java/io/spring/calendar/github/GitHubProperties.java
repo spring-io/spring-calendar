@@ -16,6 +16,8 @@
 
 package io.spring.calendar.github;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -29,6 +31,8 @@ class GitHubProperties {
 	private String username;
 
 	private String password;
+
+	private List<String> organizations;
 
 	String getUsername() {
 		return this.username;
@@ -44,6 +48,14 @@ class GitHubProperties {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public List<String> getOrganizations() {
+		return this.organizations;
+	}
+
+	public void setOrganizations(List<String> organizations) {
+		this.organizations = organizations;
 	}
 
 }

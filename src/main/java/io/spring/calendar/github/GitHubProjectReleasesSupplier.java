@@ -19,15 +19,12 @@ package io.spring.calendar.github;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.springframework.stereotype.Component;
 
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
@@ -37,20 +34,19 @@ import io.spring.calendar.release.Release;
  *
  * @author Andy Wilkinson
  */
-@Component
 class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
-
-	private final List<String> organizations = Arrays.asList("spring-cloud",
-			"spring-gradle-plugins", "spring-io", "spring-projects");
 
 	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<String, Page<Milestone>>();
 
 	private final Map<String, Page<Repository>> earlierRepositories = new HashMap<String, Page<Repository>>();
 
+	private final List<String> organizations;
+
 	private final GitHubOperations gitHub;
 
-	GitHubProjectReleasesSupplier(GitHubOperations gitHub) {
+	GitHubProjectReleasesSupplier(GitHubOperations gitHub, List<String> organizations) {
 		this.gitHub = gitHub;
+		this.organizations = organizations;
 	}
 
 	@Override
