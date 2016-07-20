@@ -10,3 +10,6 @@ calendar:
       - spring-gradle-plugins
       - spring-io
       - spring-projects
+  release:
+    project_aliases:
+      'Toolsuite Distribution': STS

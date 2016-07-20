@@ -41,10 +41,13 @@ class ReleaseUpdater {
 
 	private final ReleaseRepository releaseRepository;
 
+	private final ProjectNameAliaser projectNameAliaser;
+
 	ReleaseUpdater(List<Supplier<List<ProjectReleases>>> projectReleasesSuppliers,
-			ReleaseRepository releaseRepository) {
+			ReleaseRepository releaseRepository, ProjectNameAliaser projectNameAliaser) {
 		this.projectReleasesSuppliers = projectReleasesSuppliers;
 		this.releaseRepository = releaseRepository;
+		this.projectNameAliaser = projectNameAliaser;
 	}
 
 	@Scheduled(fixedRate = 5 * 60 * 1000)
@@ -67,9 +70,16 @@ class ReleaseUpdater {
 		List<Release> releases = releasesByProject.values().stream()
 				.flatMap((projectReleases) -> {
 					return projectReleases.getReleases().stream();
-				}).collect(Collectors.toList());
+				}) //
+				.map(this::applyNameAlias) //
+				.collect(Collectors.toList());
 		updateReleases(releases);
 		log.info("Releases updated");
+	}
+
+	private Release applyNameAlias(Release release) {
+		return new Release(this.projectNameAliaser.apply(release.getProject()),
+				release.getName(), release.getDate());
 	}
 
 	private void updateReleases(List<Release> releases) {
