@@ -25,11 +25,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A minimal represenation of a GitHub repository
+ * A minimal represenation of a GitHub repository.
  *
  * @author Andy Wilkinson
  */
-public class Repository {
+class Repository {
 
 	private final String name;
 
@@ -40,7 +40,7 @@ public class Repository {
 	private final URL milestonesUrl;
 
 	@JsonCreator
-	public Repository(@JsonProperty("name") String name,
+	Repository(@JsonProperty("name") String name,
 			@JsonProperty("full_name") String fullName,
 			@JsonProperty("milestones_url") String milestonesUrl) {
 		this.name = name;
@@ -49,19 +49,19 @@ public class Repository {
 		this.milestonesUrl = sanitizeUrl(milestonesUrl);
 	}
 
-	public String getName() {
+	String getName() {
 		return this.name;
 	}
 
-	public String getFullName() {
+	String getFullName() {
 		return this.fullName;
 	}
 
-	public String getDisplayName() {
+	String getDisplayName() {
 		return this.displayName;
 	}
 
-	public URL getMilestonesUrl() {
+	URL getMilestonesUrl() {
 		return this.milestonesUrl;
 	}
 
