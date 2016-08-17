@@ -70,7 +70,8 @@ public class GitHubTemplateTests {
 
 	private final Repository repository = new Repository("spring-boot",
 			"spring-projects/spring-boot",
-			"https://api.github.com/repos/spring-projects/spring-boot/milestones");
+			"https://api.github.com/repos/spring-projects/spring-boot/milestones",
+			"https://github.com/spring-projects/spring-boot");
 
 	@Autowired
 	private GitHubTemplate gitHub;

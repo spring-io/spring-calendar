@@ -16,42 +16,55 @@
 
 package io.spring.calendar.release;
 
+import java.net.URL;
+
 /**
- * A release of a project.
+ * A project.
  *
  * @author Andy Wilkinson
  */
-public class Release {
-
-	private final Project project;
+public class Project {
 
 	private final String name;
 
-	private final String date;
+	private final URL url;
 
 	/**
-	 * Creates a new {@code Release}.
+	 * Creates a new project.
 	 *
-	 * @param project the project
-	 * @param name the name of the release
-	 * @param date the date of the release (yyyy-mm-dd)
+	 * @param name of the project
 	 */
-	public Release(Project project, String name, String date) {
-		this.project = project;
+	public Project(String name) {
+		this(name, null);
+	}
+
+	/**
+	 * Creates a new project.
+	 *
+	 * @param name the name of the project
+	 * @param url the URL of the project
+	 */
+	public Project(String name, URL url) {
 		this.name = name;
-		this.date = date;
+		this.url = url;
 	}
 
-	Project getProject() {
-		return this.project;
-	}
-
-	String getName() {
+	/**
+	 * Returns the name of the project.
+	 *
+	 * @return the project's name
+	 */
+	public String getName() {
 		return this.name;
 	}
 
-	String getDate() {
-		return this.date;
+	/**
+	 * Returns the URL of the project.
+	 *
+	 * @return the project's URL
+	 */
+	public URL getUrl() {
+		return this.url;
 	}
 
 }

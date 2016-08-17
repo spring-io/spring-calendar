@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 
@@ -66,10 +67,10 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return version.getReleaseDate() != null;
 	}
 
-	private Release createRelease(JiraProject project, JiraVersion version) {
+	private Release createRelease(JiraProject jiraProject, JiraVersion version) {
 		try {
-			return new Release(project.getName(), version.getName(),
-					version.getReleaseDate());
+			Project project = new Project(jiraProject.getName());
+			return new Release(project, version.getName(), version.getReleaseDate());
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException(

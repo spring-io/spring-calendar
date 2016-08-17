@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 
@@ -97,8 +98,10 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return milestone.getDueOn() != null;
 	}
 
-	private Release createRelease(Repository project, Milestone milestone) {
-		return new Release(project.getDisplayName(), milestone.getTitle(),
+	private Release createRelease(Repository repository, Milestone milestone) {
+		return new Release(
+				new Project(repository.getDisplayName(), repository.getHtmlUrl()),
+				milestone.getTitle(),
 				milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
 						.format(DateTimeFormatter.ISO_LOCAL_DATE));
 	}

@@ -45,9 +45,10 @@ class ReleaseEventsController {
 	List<Map<String, Object>> releases() {
 		return this.releaseRepository.findAll().stream().map((release) -> {
 			Map<String, Object> event = new HashMap<>();
-			event.put("title", release.getProject() + " " + release.getName());
+			event.put("title", release.getProject().getName() + " " + release.getName());
 			event.put("allDay", true);
 			event.put("start", release.getDate());
+			event.put("url", release.getProject().getUrl());
 			return event;
 		}).collect(Collectors.toList());
 	}
