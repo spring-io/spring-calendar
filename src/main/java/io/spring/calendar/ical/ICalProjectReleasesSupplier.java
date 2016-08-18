@@ -34,6 +34,7 @@ import biweekly.component.VEvent;
 import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
+import io.spring.calendar.release.Release.Status;
 
 /**
  * A {@link Supplier} of {@link ProjectReleases} for {@link ICalProject ICalProjects}.
@@ -90,7 +91,13 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		}
 		return new Release(new Project(project.getName()), name,
 				new SimpleDateFormat("yyyy-MM-dd")
-						.format(event.getDateStart().getValue()));
+						.format(event.getDateStart().getValue()),
+				getStatus(event));
+	}
+
+	private Status getStatus(VEvent event) {
+		return event.getStatus() == biweekly.property.Status.completed() ? Status.CLOSED
+				: Status.OPEN;
 	}
 
 	private static List<ICalProject> createProjects() {

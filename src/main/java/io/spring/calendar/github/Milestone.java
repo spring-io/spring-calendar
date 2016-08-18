@@ -29,15 +29,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 class Milestone {
 
+	/**
+	 * State of the milestone according to GitHub.
+	 *
+	 */
+	static enum State {
+		@JsonProperty("open") OPEN, @JsonProperty("closed") CLOSED
+	};
+
 	private final String title;
 
 	private final ZonedDateTime dueOn;
 
+	private final State state;
+
 	@JsonCreator
 	Milestone(@JsonProperty("title") String title,
-			@JsonProperty("due_on") ZonedDateTime dueOn) {
+			@JsonProperty("due_on") ZonedDateTime dueOn,
+			@JsonProperty("state") State state) {
 		this.title = title;
 		this.dueOn = dueOn == null ? null : dueOn.withZoneSameInstant(ZoneId.of("UTC"));
+		this.state = state;
 	}
 
 	String getTitle() {
@@ -46,6 +58,10 @@ class Milestone {
 
 	ZonedDateTime getDueOn() {
 		return this.dueOn;
+	}
+
+	public State getState() {
+		return this.state;
 	}
 
 }

@@ -16,6 +16,9 @@
 
 package io.spring.calendar.release;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 /**
  * A release of a project.
  *
@@ -23,11 +26,32 @@ package io.spring.calendar.release;
  */
 public class Release {
 
+	/**
+	 * Status of the release, if known.
+	 *
+	 */
+	public static enum Status {
+		/**
+		 * The release is open (not yet closed).
+		 */
+		OPEN,
+		/**
+		 * The release is closed (completed).
+		 */
+		CLOSED,
+		/**
+		 * The release status is not known.
+		 */
+		UNKNOWN
+	};
+
 	private final Project project;
 
 	private final String name;
 
 	private final String date;
+
+	private final Status status;
 
 	/**
 	 * Creates a new {@code Release}.
@@ -35,11 +59,13 @@ public class Release {
 	 * @param project the project
 	 * @param name the name of the release
 	 * @param date the date of the release (yyyy-mm-dd)
+	 * @param status the status of the release
 	 */
-	public Release(Project project, String name, String date) {
+	public Release(Project project, String name, String date, Status status) {
 		this.project = project;
 		this.name = name;
 		this.date = date;
+		this.status = status;
 	}
 
 	Project getProject() {
@@ -54,4 +80,12 @@ public class Release {
 		return this.date;
 	}
 
+	Status getStatus() {
+		return this.status;
+	}
+
+	boolean isOverdue() {
+		return this.status == Status.OPEN && LocalDate.now(ZoneId.of("Europe/London"))
+				.isAfter(LocalDate.parse(this.date));
+	}
 }

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
+import io.spring.calendar.release.Release.Status;
 
 /**
  * Controller for exposing {@link Release Releases} as an iCalendar-format download.
@@ -61,6 +62,9 @@ class ReleaseICalController {
 			Date date = new SimpleDateFormat("yyyy-MM-dd").parse(release.getDate());
 			event.setDateStart(date, false);
 			event.setDateEnd(date, false);
+			if (release.getStatus() == Status.CLOSED) {
+				event.setStatus(biweekly.property.Status.completed());
+			}
 		}
 		catch (ParseException ex) {
 			throw new RuntimeException(ex);

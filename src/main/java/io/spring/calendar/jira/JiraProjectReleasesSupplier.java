@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
+import io.spring.calendar.release.Release.Status;
 
 /**
  * A {@link Supplier} of {@link ProjectReleases} for projects managed in JIRA.
@@ -70,12 +71,17 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private Release createRelease(JiraProject jiraProject, JiraVersion version) {
 		try {
 			Project project = new Project(jiraProject.getName());
-			return new Release(project, version.getName(), version.getReleaseDate());
+			return new Release(project, version.getName(), version.getReleaseDate(),
+					getStatus(version));
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException(
 					"Failed to parse " + version.getReleaseDate());
 		}
+	}
+
+	private Status getStatus(JiraVersion version) {
+		return version.isReleased() ? Status.CLOSED : Status.OPEN;
 	}
 
 }

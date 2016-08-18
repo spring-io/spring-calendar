@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.spring.calendar.release.Release.Status;
+
 /**
  * Controller for exposing {@link Release Releases} as Full Calendar events.
  *
@@ -49,6 +51,12 @@ class ReleaseEventsController {
 			event.put("allDay", true);
 			event.put("start", release.getDate());
 			event.put("url", release.getProject().getUrl());
+			if (release.getStatus() == Status.CLOSED) {
+				event.put("backgroundColor", "#6db33f");
+			}
+			else if (release.isOverdue()) {
+				event.put("backgroundColor", "#d14");
+			}
 			return event;
 		}).collect(Collectors.toList());
 	}
