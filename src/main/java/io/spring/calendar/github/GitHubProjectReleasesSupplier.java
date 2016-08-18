@@ -105,11 +105,12 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 				new Project(repository.getDisplayName(), repository.getHtmlUrl()),
 				milestone.getTitle(),
 				milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
-						.format(DateTimeFormatter.ISO_LOCAL_DATE), getStatus(milestone));
+						.format(DateTimeFormatter.ISO_LOCAL_DATE),
+				getStatus(milestone));
 	}
 
 	private Status getStatus(Milestone milestone) {
-		return milestone.getState() == State.open ? Status.OPEN : Status.CLOSED;
+		return milestone.getState() == State.OPEN ? Status.OPEN : Status.CLOSED;
 	}
 
 }

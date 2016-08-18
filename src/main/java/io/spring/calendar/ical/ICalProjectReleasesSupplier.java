@@ -91,11 +91,13 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		}
 		return new Release(new Project(project.getName()), name,
 				new SimpleDateFormat("yyyy-MM-dd")
-						.format(event.getDateStart().getValue()), getStatus(event));
+						.format(event.getDateStart().getValue()),
+				getStatus(event));
 	}
 
 	private Status getStatus(VEvent event) {
-		return event.getStatus() == biweekly.property.Status.completed() ? Status.CLOSED : Status.OPEN;
+		return event.getStatus() == biweekly.property.Status.completed() ? Status.CLOSED
+				: Status.OPEN;
 	}
 
 	private static List<ICalProject> createProjects() {

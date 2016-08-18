@@ -30,11 +30,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 class Milestone {
 
 	/**
-	 * State of the milestone according to github.
+	 * State of the milestone according to GitHub.
 	 *
 	 */
 	static enum State {
-		open, closed
+		@JsonProperty("open") OPEN, @JsonProperty("closed") CLOSED
 	};
 
 	private final String title;

@@ -71,8 +71,9 @@ public class JiraTemplateTests {
 				.expect(requestTo(
 						"https://jira.spring.io/rest/api/2/project/SPR/versions"))
 				.andRespond(this.testMethodResponse);
-		List<JiraVersion> versions = this.jira.getVersions(new JiraProject("Spring Framework",
-				URI.create("https://jira.spring.io/rest/api/2/project/SPR")));
+		List<JiraVersion> versions = this.jira
+				.getVersions(new JiraProject("Spring Framework",
+						URI.create("https://jira.spring.io/rest/api/2/project/SPR")));
 		assertThat(versions).hasSize(161);
 		JiraVersion version = versions.get(40);
 		assertThat(version.isReleased()).isEqualTo(true);

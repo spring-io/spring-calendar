@@ -71,7 +71,8 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private Release createRelease(JiraProject jiraProject, JiraVersion version) {
 		try {
 			Project project = new Project(jiraProject.getName());
-			return new Release(project, version.getName(), version.getReleaseDate(), getStatus(version));
+			return new Release(project, version.getName(), version.getReleaseDate(),
+					getStatus(version));
 		}
 		catch (Exception ex) {
 			throw new IllegalStateException(

@@ -16,9 +16,6 @@
 
 package io.spring.calendar.release;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,17 +54,8 @@ class ReleaseEventsController {
 			if (release.getStatus() == Status.CLOSED) {
 				event.put("backgroundColor", "#6db33f");
 			}
-			else if (release.getStatus() == Status.OPEN) {
-				try {
-					Date date = new SimpleDateFormat("yyyy-MM-dd")
-							.parse(release.getDate());
-					if (date.before(new Date())) {
-						event.put("backgroundColor", "#d14");
-					}
-				}
-				catch (ParseException ex) {
-				}
-
+			else if (release.isOverdue()) {
+				event.put("backgroundColor", "#d14");
 			}
 			return event;
 		}).collect(Collectors.toList());

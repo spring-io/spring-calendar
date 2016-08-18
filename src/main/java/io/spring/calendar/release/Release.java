@@ -16,6 +16,9 @@
 
 package io.spring.calendar.release;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 /**
  * A release of a project.
  *
@@ -79,5 +82,10 @@ public class Release {
 
 	Status getStatus() {
 		return this.status;
+	}
+
+	boolean isOverdue() {
+		return this.status == Status.OPEN && LocalDate.now(ZoneId.of("Europe/London"))
+				.isAfter(LocalDate.parse(this.date));
 	}
 }
