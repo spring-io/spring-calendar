@@ -75,6 +75,7 @@ public class JiraTemplateTests {
 				URI.create("https://jira.spring.io/rest/api/2/project/SPR")));
 		assertThat(versions).hasSize(161);
 		JiraVersion version = versions.get(40);
+		assertThat(version.isReleased()).isEqualTo(true);
 		assertThat(version.getName()).isEqualTo("2.0.4");
 		assertThat(version.getReleaseDate()).isEqualTo("2007-04-09");
 	}
