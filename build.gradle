@@ -4,12 +4,11 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RC1")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
 	}
 }
 
 repositories {
-	maven { url 'https://repo.spring.io/libs-milestone' }
 	mavenCentral()
 }
 
