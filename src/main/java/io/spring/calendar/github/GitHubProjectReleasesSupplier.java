@@ -26,9 +26,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.spring.calendar.github.Milestone.State;
 import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
+import io.spring.calendar.release.Release.Status;
 
 /**
  * A {@link Supplier} of {@link ProjectReleases} for projects managed on GitHub.
@@ -103,7 +105,11 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 				new Project(repository.getDisplayName(), repository.getHtmlUrl()),
 				milestone.getTitle(),
 				milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
-						.format(DateTimeFormatter.ISO_LOCAL_DATE));
+						.format(DateTimeFormatter.ISO_LOCAL_DATE), getStatus(milestone));
+	}
+
+	private Status getStatus(Milestone milestone) {
+		return milestone.getState() == State.open ? Status.OPEN : Status.CLOSED;
 	}
 
 }

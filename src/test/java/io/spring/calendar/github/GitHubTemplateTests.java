@@ -94,6 +94,7 @@ public class GitHubTemplateTests {
 		Page<Milestone> page = this.gitHub.getMilestones(this.repository, null);
 		assertThat(page.getContent()).hasSize(68);
 		this.server.verify();
+		assertThat(page.getContent().get(67).getState()).isEqualTo(Milestone.State.open);
 	}
 
 	@Test
