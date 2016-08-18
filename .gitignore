@@ -1,6 +1,11 @@
 /bin
 /build
+/target
+pom.xml
+.mvn/
+mvnw*
 .gradle/
 .settings/
 .project
 .classpath
+.factorypath

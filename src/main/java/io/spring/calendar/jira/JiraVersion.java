@@ -30,11 +30,14 @@ class JiraVersion {
 
 	private final String releaseDate;
 
+	private final boolean released;
+
 	@JsonCreator
 	JiraVersion(@JsonProperty("name") String name,
-			@JsonProperty("releaseDate") String releaseDate) {
+			@JsonProperty("releaseDate") String releaseDate, @JsonProperty("released") boolean released) {
 		this.name = name;
 		this.releaseDate = releaseDate;
+		this.released = released;
 	}
 
 	String getName() {
@@ -43,6 +46,10 @@ class JiraVersion {
 
 	String getReleaseDate() {
 		return this.releaseDate;
+	}
+
+	public boolean isReleased() {
+		return this.released;
 	}
 
 }
