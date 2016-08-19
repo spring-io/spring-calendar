@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
@@ -89,10 +88,8 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		if (name.startsWith(project.getName())) {
 			name = name.substring(project.getName().length()).trim();
 		}
-		return new Release(new Project(project.getName()), name,
-				new SimpleDateFormat("yyyy-MM-dd")
-						.format(event.getDateStart().getValue()),
-				getStatus(event));
+		return new Release(project.getName(), name, new SimpleDateFormat("yyyy-MM-dd")
+				.format(event.getDateStart().getValue()), getStatus(event), null);
 	}
 
 	private Status getStatus(VEvent event) {

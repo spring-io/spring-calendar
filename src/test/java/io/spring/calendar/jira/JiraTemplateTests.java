@@ -60,6 +60,7 @@ public class JiraTemplateTests {
 		List<JiraProject> projects = this.jira.getProjects();
 		assertThat(projects).hasSize(92);
 		JiraProject project = projects.get(0);
+		assertThat(project.getKey()).isEqualTo("GREENHOUSE");
 		assertThat(project.getName()).isEqualTo("Greenhouse");
 		assertThat(project.getUri())
 				.isEqualTo(URI.create("https://jira.spring.io/rest/api/2/project/10540"));
@@ -72,7 +73,7 @@ public class JiraTemplateTests {
 						"https://jira.spring.io/rest/api/2/project/SPR/versions"))
 				.andRespond(this.testMethodResponse);
 		List<JiraVersion> versions = this.jira
-				.getVersions(new JiraProject("Spring Framework",
+				.getVersions(new JiraProject("SPR", "Spring Framework",
 						URI.create("https://jira.spring.io/rest/api/2/project/SPR")));
 		assertThat(versions).hasSize(161);
 		JiraVersion version = versions.get(40);

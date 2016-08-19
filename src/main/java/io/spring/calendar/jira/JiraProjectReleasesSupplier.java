@@ -16,13 +16,14 @@
 
 package io.spring.calendar.jira;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
@@ -68,15 +69,17 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return version.getReleaseDate() != null;
 	}
 
-	private Release createRelease(JiraProject jiraProject, JiraVersion version) {
+	private Release createRelease(JiraProject project, JiraVersion version) {
+
 		try {
-			Project project = new Project(jiraProject.getName());
-			return new Release(project, version.getName(), version.getReleaseDate(),
-					getStatus(version));
+			return new Release(project.getName(), version.getName(),
+					version.getReleaseDate(), getStatus(version),
+					new URL(String.format(
+							"https://jira.spring.io/browse/%s/fixforversion/%s",
+							project.getKey(), version.getId())));
 		}
-		catch (Exception ex) {
-			throw new IllegalStateException(
-					"Failed to parse " + version.getReleaseDate());
+		catch (MalformedURLException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 

@@ -43,13 +43,16 @@ class Milestone {
 
 	private final State state;
 
+	private final long number;
+
 	@JsonCreator
 	Milestone(@JsonProperty("title") String title,
 			@JsonProperty("due_on") ZonedDateTime dueOn,
-			@JsonProperty("state") State state) {
+			@JsonProperty("state") State state, @JsonProperty("number") long number) {
 		this.title = title;
 		this.dueOn = dueOn == null ? null : dueOn.withZoneSameInstant(ZoneId.of("UTC"));
 		this.state = state;
+		this.number = number;
 	}
 
 	String getTitle() {
@@ -60,8 +63,12 @@ class Milestone {
 		return this.dueOn;
 	}
 
-	public State getState() {
+	State getState() {
 		return this.state;
+	}
+
+	long getNumber() {
+		return this.number;
 	}
 
 }

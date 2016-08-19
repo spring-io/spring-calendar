@@ -26,6 +26,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 class JiraVersion {
 
+	private final String id;
+
 	private final String name;
 
 	private final String releaseDate;
@@ -33,12 +35,17 @@ class JiraVersion {
 	private final boolean released;
 
 	@JsonCreator
-	JiraVersion(@JsonProperty("name") String name,
+	JiraVersion(@JsonProperty("id") String id, @JsonProperty("name") String name,
 			@JsonProperty("releaseDate") String releaseDate,
 			@JsonProperty("released") boolean released) {
+		this.id = id;
 		this.name = name;
 		this.releaseDate = releaseDate;
 		this.released = released;
+	}
+
+	String getId() {
+		return this.id;
 	}
 
 	String getName() {

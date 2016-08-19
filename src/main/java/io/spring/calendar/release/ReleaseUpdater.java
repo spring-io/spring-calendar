@@ -78,11 +78,10 @@ class ReleaseUpdater {
 	}
 
 	private Release applyNameAlias(Release release) {
-		Project project = new Project(
-				this.projectNameAliaser.apply(release.getProject().getName()),
-				release.getProject().getUrl());
-		return new Release(project, release.getName(), release.getDate(),
-				release.getStatus());
+		return new Release(this.projectNameAliaser.apply(release.getProject()),
+				release.getName(), release.getDate(), release.getStatus(),
+				release.getUrl());
+
 	}
 
 	private void updateReleases(List<Release> releases) {

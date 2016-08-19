@@ -18,8 +18,8 @@ package io.spring.calendar.github;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,7 +86,7 @@ public class GitHubTemplateTests {
 	RestTemplateBuilder restTemplateBuilder;
 
 	@Test
-	public void getMilestones() {
+	public void getMilestones() throws MalformedURLException {
 		this.server
 				.expect(requestTo(
 						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
@@ -95,6 +95,7 @@ public class GitHubTemplateTests {
 		assertThat(page.getContent()).hasSize(68);
 		this.server.verify();
 		assertThat(page.getContent().get(67).getState()).isEqualTo(Milestone.State.OPEN);
+		assertThat(page.getContent().get(67).getNumber()).isEqualTo(52);
 	}
 
 	@Test
@@ -106,9 +107,10 @@ public class GitHubTemplateTests {
 		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects",
 				null);
 		assertThat(page.getContent()).hasSize(30);
-		assertThat(page.getContent().get(0).getMilestonesUrl()).isEqualTo(URI
-				.create("https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones")
-				.toURL());
+		assertThat(page.getContent().get(0).getMilestonesUrl()).isEqualTo(new URL(
+				"https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones"));
+		assertThat(page.getContent().get(0).getHtmlUrl()).isEqualTo(new URL(
+				"https://github.com/spring-projects/Spring-Integration-in-Action"));
 		this.server.verify();
 	}
 

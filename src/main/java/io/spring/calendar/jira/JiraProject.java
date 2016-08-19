@@ -26,38 +26,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Andy Wilkinson
  */
-public class JiraProject {
+class JiraProject {
+
+	private String key;
 
 	private String name;
 
 	private URI uri;
 
-	/**
-	 * Creates a new project with the given {@code name} and {@code url}.
-	 *
-	 * @param name the project's name
-	 * @param uri the project's URI
-	 */
 	@JsonCreator
-	public JiraProject(@JsonProperty("name") String name, @JsonProperty("self") URI uri) {
+	JiraProject(@JsonProperty("key") String key, @JsonProperty("name") String name,
+			@JsonProperty("self") URI uri) {
+		this.key = key;
 		this.name = name;
 		this.uri = uri;
 	}
 
-	/**
-	 * Returns the name of the project.
-	 *
-	 * @return the project's name
-	 */
-	public String getName() {
+	String getKey() {
+		return this.key;
+	}
+
+	String getName() {
 		return this.name;
 	}
 
-	/**
-	 * Returns the URI of the project.
-	 * @return the project's URI
-	 */
-	public URI getUri() {
+	URI getUri() {
 		return this.uri;
 	}
 

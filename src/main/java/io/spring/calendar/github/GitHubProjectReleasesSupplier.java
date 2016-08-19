@@ -16,6 +16,8 @@
 
 package io.spring.calendar.github;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -27,7 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.spring.calendar.github.Milestone.State;
-import io.spring.calendar.release.Project;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
@@ -100,13 +101,17 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return milestone.getDueOn() != null;
 	}
 
-	private Release createRelease(Repository repository, Milestone milestone) {
-		return new Release(
-				new Project(repository.getDisplayName(), repository.getHtmlUrl()),
-				milestone.getTitle(),
-				milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
-						.format(DateTimeFormatter.ISO_LOCAL_DATE),
-				getStatus(milestone));
+	private Release createRelease(Repository project, Milestone milestone) {
+		try {
+			return new Release(project.getDisplayName(), milestone.getTitle(),
+					milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
+							.format(DateTimeFormatter.ISO_LOCAL_DATE),
+					getStatus(milestone), new URL(project.getHtmlUrl().toString()
+							+ "/milestone/" + milestone.getNumber()));
+		}
+		catch (MalformedURLException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	private Status getStatus(Milestone milestone) {

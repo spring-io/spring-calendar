@@ -16,6 +16,7 @@
 
 package io.spring.calendar.release;
 
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -45,13 +46,15 @@ public class Release {
 		UNKNOWN
 	};
 
-	private final Project project;
+	private final String project;
 
 	private final String name;
 
 	private final String date;
 
 	private final Status status;
+
+	private final URL url;
 
 	/**
 	 * Creates a new {@code Release}.
@@ -60,15 +63,17 @@ public class Release {
 	 * @param name the name of the release
 	 * @param date the date of the release (yyyy-mm-dd)
 	 * @param status the status of the release
+	 * @param url the URL of the release
 	 */
-	public Release(Project project, String name, String date, Status status) {
+	public Release(String project, String name, String date, Status status, URL url) {
 		this.project = project;
 		this.name = name;
 		this.date = date;
 		this.status = status;
+		this.url = url;
 	}
 
-	Project getProject() {
+	String getProject() {
 		return this.project;
 	}
 
@@ -88,4 +93,9 @@ public class Release {
 		return this.status == Status.OPEN && LocalDate.now(ZoneId.of("Europe/London"))
 				.isAfter(LocalDate.parse(this.date));
 	}
+
+	public URL getUrl() {
+		return this.url;
+	}
+
 }
