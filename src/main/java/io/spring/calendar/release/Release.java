@@ -94,7 +94,7 @@ public class Release {
 				.isAfter(LocalDate.parse(this.date));
 	}
 
-	public URL getUrl() {
+	URL getUrl() {
 		return this.url;
 	}
 
