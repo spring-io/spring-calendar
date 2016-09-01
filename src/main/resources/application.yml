@@ -6,6 +6,7 @@ spring:
 calendar:
   github:
     organizations:
+      - reactor
       - spring-cloud
       - spring-gradle-plugins
       - spring-io
