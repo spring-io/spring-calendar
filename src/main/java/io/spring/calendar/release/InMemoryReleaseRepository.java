@@ -16,11 +16,16 @@
 
 package io.spring.calendar.release;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +33,7 @@ import org.springframework.stereotype.Repository;
  * An in-memory implementation of {@code ReleaseRepository}.
  *
  * @author Andy Wilkinson
+ * @author Brian Clozel
  */
 @Repository
 class InMemoryReleaseRepository implements ReleaseRepository {
@@ -51,11 +57,36 @@ class InMemoryReleaseRepository implements ReleaseRepository {
 	public List<Release> findAll() {
 		this.lock.readLock().lock();
 		try {
-			return Collections.unmodifiableList(this.releases);
+			return new ArrayList<>(this.releases);
 		}
 		finally {
 			this.lock.readLock().unlock();
 		}
+	}
+
+	@Override
+	public List<Release> findAllInPeriod(Date start, Date end) {
+		this.lock.readLock().lock();
+		try {
+			return this.releases.stream() //
+					.filter(isWithinPeriod(start, end)) //
+					.collect(Collectors.toList());
+		}
+		finally {
+			this.lock.readLock().unlock();
+		}
+	}
+
+	private Predicate<Release> isWithinPeriod(Date start, Date end) {
+		return release -> {
+			try {
+				Date date = new SimpleDateFormat("yyyy-MM-dd").parse(release.getDate());
+				return !(date.before(start) || date.after(end));
+			}
+			catch (ParseException e) {
+				return true;
+			}
+		};
 	}
 
 }

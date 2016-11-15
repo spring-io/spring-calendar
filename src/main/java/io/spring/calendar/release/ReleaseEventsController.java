@@ -22,10 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import io.spring.calendar.release.Release.Status;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +32,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.spring.calendar.release.Release.Status;
+
 /**
  * Controller for exposing {@link Release Releases} as Full Calendar events.
  *
  * @author Andy Wilkinson
+ * @author Brian Clozel
  */
 @RestController
 @RequestMapping("/releases")
@@ -50,19 +50,12 @@ class ReleaseEventsController {
 		this.releaseRepository = releaseRepository;
 	}
 
-	@ExceptionHandler
-	public ResponseEntity<String> handleDateParseException(ParseException exc) {
-		return ResponseEntity.badRequest().body(exc.getMessage());
-	}
-
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	List<Map<String, Object>> releases(@RequestParam String start, @RequestParam String end) throws ParseException {
-
+	List<Map<String, Object>> releases(@RequestParam String start,
+			@RequestParam String end) throws ParseException {
 		Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(start);
 		Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(end);
-
-		return this.releaseRepository.findAll().stream()
-				.filter(isWithinPeriod(startDate, endDate))
+		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream()
 				.map(release -> {
 					Map<String, Object> event = new HashMap<>();
 					event.put("title", release.getProject() + " " + release.getName());
@@ -79,16 +72,9 @@ class ReleaseEventsController {
 				}).collect(Collectors.toList());
 	}
 
-	private Predicate<Release> isWithinPeriod(Date start, Date end) {
-		return release -> {
-			try {
-				Date date = new SimpleDateFormat("yyyy-MM-dd").parse(release.getDate());
-				return !(date.before(start) || date.after(end));
-			}
-			catch (ParseException e) {
-				return true;
-			}
-		};
+	@ExceptionHandler
+	ResponseEntity<String> handleDateParseException(ParseException exc) {
+		return ResponseEntity.badRequest().body(exc.getMessage());
 	}
 
 }
