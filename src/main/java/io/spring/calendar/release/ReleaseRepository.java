@@ -16,6 +16,7 @@
 
 package io.spring.calendar.release;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,5 +39,15 @@ public interface ReleaseRepository {
 	 * @return the releases
 	 */
 	List<Release> findAll();
+
+	/**
+	 * Returns all of the releases known to the repository with a release date in the
+	 * given period.
+	 *
+	 * @param start the start of the period
+	 * @param end the end of the period
+	 * @return the releases in the period
+	 */
+	List<Release> findAllInPeriod(Date start, Date end);
 
 }

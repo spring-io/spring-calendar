@@ -16,14 +16,20 @@
 
 package io.spring.calendar.release;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.spring.calendar.release.Release.Status;
@@ -32,6 +38,7 @@ import io.spring.calendar.release.Release.Status;
  * Controller for exposing {@link Release Releases} as Full Calendar events.
  *
  * @author Andy Wilkinson
+ * @author Brian Clozel
  */
 @RestController
 @RequestMapping("/releases")
@@ -44,21 +51,30 @@ class ReleaseEventsController {
 	}
 
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	List<Map<String, Object>> releases() {
-		return this.releaseRepository.findAll().stream().map((release) -> {
-			Map<String, Object> event = new HashMap<>();
-			event.put("title", release.getProject() + " " + release.getName());
-			event.put("allDay", true);
-			event.put("start", release.getDate());
-			event.put("url", release.getUrl());
-			if (release.getStatus() == Status.CLOSED) {
-				event.put("backgroundColor", "#6db33f");
-			}
-			else if (release.isOverdue()) {
-				event.put("backgroundColor", "#d14");
-			}
-			return event;
-		}).collect(Collectors.toList());
+	List<Map<String, Object>> releases(@RequestParam String start,
+			@RequestParam String end) throws ParseException {
+		Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(start);
+		Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(end);
+		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream()
+				.map(release -> {
+					Map<String, Object> event = new HashMap<>();
+					event.put("title", release.getProject() + " " + release.getName());
+					event.put("allDay", true);
+					event.put("start", release.getDate());
+					event.put("url", release.getUrl());
+					if (release.getStatus() == Status.CLOSED) {
+						event.put("backgroundColor", "#6db33f");
+					}
+					else if (release.isOverdue()) {
+						event.put("backgroundColor", "#d14");
+					}
+					return event;
+				}).collect(Collectors.toList());
+	}
+
+	@ExceptionHandler
+	ResponseEntity<String> handleDateParseException(ParseException exc) {
+		return ResponseEntity.badRequest().body(exc.getMessage());
 	}
 
 }
