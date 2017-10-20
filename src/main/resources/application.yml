@@ -6,6 +6,7 @@ spring:
 calendar:
   github:
     organizations:
+      - micrometer-metrics
       - reactor
       - spring-cloud
       - spring-gradle-plugins
