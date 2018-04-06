@@ -28,6 +28,8 @@ targetCompatibility = 1.8
 dependencies {
 	compile 'net.sf.biweekly:biweekly:0.4.6'
 	compile 'org.springframework.boot:spring-boot-starter-web'
+	compile 'org.webjars:webjars-locator-core'
+	compile 'org.webjars.npm:fullcalendar:3.9.0'
 	runtime 'org.apache.httpcomponents:httpclient'
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
