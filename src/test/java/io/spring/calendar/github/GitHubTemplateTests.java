@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -233,6 +234,7 @@ public class GitHubTemplateTests {
 	/**
 	 * Test configuration for {@link GitHubTemplate}.
 	 */
+	@Configuration
 	static class TemplateConfiguration {
 
 		@Bean

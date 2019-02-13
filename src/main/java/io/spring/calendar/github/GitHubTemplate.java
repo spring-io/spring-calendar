@@ -59,7 +59,7 @@ class GitHubTemplate implements GitHubOperations {
 	GitHubTemplate(String username, String password, LinkParser linkParser,
 			RestTemplateBuilder restTemplateBuilder) {
 		if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-			restTemplateBuilder = restTemplateBuilder.basicAuthorization(username,
+			restTemplateBuilder = restTemplateBuilder.basicAuthentication(username,
 					password);
 		}
 		this.rest = restTemplateBuilder.additionalCustomizers((restTemplate) -> {
