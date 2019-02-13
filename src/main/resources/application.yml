@@ -7,6 +7,7 @@ calendar:
   github:
     organizations:
       - micrometer-metrics
+      - r2dbc
       - reactor
       - spring-cloud
       - spring-gradle-plugins
