@@ -1494,7 +1494,7 @@
     },
     {
         "archived": false,
-        "description": "Issues waiting to be triaged by staff. see \"the lifecycle of an issue\" at http://bit.ly/VkhZPN",
+        "description": "Issues waiting to be triaged by staff. see \"the lifecycle of an issue\" at https://bit.ly/VkhZPN",
         "id": "13916",
         "name": "Waiting for Triage",
         "projectId": 10000,
@@ -1512,7 +1512,7 @@
     },
     {
         "archived": false,
-        "description": "Triaged issues well-suited for community contributions. see contributor guidelines at http://bit.ly/WIUFbm",
+        "description": "Triaged issues well-suited for community contributions. see contributor guidelines at https://bit.ly/WIUFbm",
         "id": "13915",
         "name": "Contributions Welcome",
         "projectId": 10000,
