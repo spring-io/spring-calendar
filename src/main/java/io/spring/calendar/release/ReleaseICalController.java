@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +20,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
 import io.spring.calendar.release.Release.Status;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller for exposing {@link Release Releases} as an iCalendar-format download.
@@ -49,9 +49,7 @@ class ReleaseICalController {
 		calendar.setExperimentalProperty("X-WR-CALNAME", "Spring Releases");
 		this.releaseRepository.findAll().stream() //
 				.map(this::createEvent) //
-				.forEach((event) -> {
-					calendar.addEvent(event);
-				});
+				.forEach(calendar::addEvent);
 		return Biweekly.write(calendar).go();
 	}
 

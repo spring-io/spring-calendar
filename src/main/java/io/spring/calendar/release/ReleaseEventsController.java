@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.spring.calendar.release.Release.Status;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,8 +33,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.spring.calendar.release.Release.Status;
 
 /**
  * Controller for exposing {@link Release Releases} as Full Calendar events.
@@ -56,7 +56,7 @@ class ReleaseEventsController {
 		Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(start);
 		Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(end);
 		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream()
-				.map(release -> {
+				.map((release) -> {
 					Map<String, Object> event = new HashMap<>();
 					event.put("title", release.getProject() + " " + release.getName());
 					event.put("allDay", true);

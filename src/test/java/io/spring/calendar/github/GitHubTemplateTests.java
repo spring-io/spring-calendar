@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,8 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.spring.calendar.github.GitHubTemplateTests.TemplateConfiguration;
+import io.spring.calendar.test.TestMethodResponseCreator;
+import io.spring.calendar.test.TestMethodResponseTestExecutionListener;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -44,13 +50,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.RequestMatcher;
 import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.util.CollectionUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.spring.calendar.github.GitHubTemplateTests.TemplateConfiguration;
-import io.spring.calendar.test.TestMethodResponseCreator;
-import io.spring.calendar.test.TestMethodResponseTestExecutionListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
@@ -88,9 +87,8 @@ public class GitHubTemplateTests {
 
 	@Test
 	public void getMilestones() throws MalformedURLException {
-		this.server
-				.expect(requestTo(
-						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
+		this.server.expect(requestTo(
+				"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
 				.andRespond(this.testMethodResponse);
 		Page<Milestone> page = this.gitHub.getMilestones(this.repository, null);
 		assertThat(page.getContent()).hasSize(68);
@@ -101,9 +99,8 @@ public class GitHubTemplateTests {
 
 	@Test
 	public void getPublicRepositories() throws URISyntaxException, MalformedURLException {
-		this.server
-				.expect(requestTo(
-						"https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
+		this.server.expect(requestTo(
+				"https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
 				.andRespond(this.testMethodResponse);
 		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects",
 				null);
@@ -117,9 +114,8 @@ public class GitHubTemplateTests {
 
 	@Test
 	public void paging() {
-		this.server
-				.expect(requestTo(
-						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
+		this.server.expect(requestTo(
+				"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
 				.andRespond(response(2, 3));
 		this.server.expect(requestTo(createUrl(2))).andRespond(response(3, 3));
 		this.server.expect(requestTo(createUrl(3))).andRespond(
@@ -154,11 +150,9 @@ public class GitHubTemplateTests {
 	public void requestIsNotConditionalWhenEarlierContentFilledThePage()
 			throws JsonProcessingException {
 		String originalUrl = "https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100";
-		this.server.expect(requestTo(originalUrl))
-				.andRespond(withSuccess()
-						.body(new ObjectMapper()
-								.writeValueAsString(createMilestones(100)))
-						.contentType(MediaType.APPLICATION_JSON));
+		this.server.expect(requestTo(originalUrl)).andRespond(withSuccess()
+				.body(new ObjectMapper().writeValueAsString(createMilestones(100)))
+				.contentType(MediaType.APPLICATION_JSON));
 		this.server.expect(requestTo(originalUrl))
 				.andExpect(missingHeader("If-None-Match"))
 				.andRespond(withSuccess()

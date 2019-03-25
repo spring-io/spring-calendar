@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,14 +26,14 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
-
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
 import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
+
+import org.springframework.stereotype.Component;
 
 /**
  * A {@link Supplier} of {@link ProjectReleases} for {@link ICalProject ICalProjects}.
@@ -54,11 +54,9 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private ProjectReleases createProjectReleases(ICalProject project) {
 		List<Release> releases = parseICalendars(project) //
 				.stream() //
-				.flatMap((calendar) -> {
-					return calendar.getEvents().stream();
-				}).map((event) -> {
-					return createRelease(project, event);
-				}).collect(Collectors.toList());
+				.flatMap((calendar) -> calendar.getEvents().stream())
+				.map((event) -> createRelease(project, event))
+				.collect(Collectors.toList());
 		return new ProjectReleases(project.getName(), releases);
 	}
 

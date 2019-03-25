@@ -4,6 +4,7 @@ buildscript {
 	}
 	dependencies {
 		classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.2.RELEASE'
+		classpath "io.spring.javaformat:spring-javaformat-gradle-plugin:$javaFormatVersion"
 	}
 }
 
@@ -12,6 +13,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'checkstyle'
+apply plugin: 'io.spring.javaformat'
 
 repositories {
 	mavenCentral()
@@ -19,13 +21,13 @@ repositories {
 
 jar {
 	baseName = 'spring-calendar'
-	version = '0.1.0.BUILD-SNAPSHOT'
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+	checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:$javaFormatVersion"
 	compile 'net.sf.biweekly:biweekly:0.4.6'
 	compile 'org.springframework.boot:spring-boot-starter-web'
 	compile 'org.webjars:webjars-locator-core'
@@ -35,16 +37,6 @@ dependencies {
 }
 
 checkstyle {
-	configFile = file('config/checkstyle/checkstyle.xml')
 	configProperties = [ 'checkstyle.config.dir' : file('config/checkstyle') ]
-	toolVersion = '6.10.1'
-}
-
-eclipseJdt {
-	inputFile = rootProject.file('config/eclipse/org.eclipse.jdt.core.prefs')
-	doLast {
-		project.file('.settings/org.eclipse.jdt.ui.prefs').withWriter { writer ->
-			writer << rootProject.file('config/eclipse/org.eclipse.jdt.ui.prefs').text
-		}
-	}
+	toolVersion = '8.18'
 }

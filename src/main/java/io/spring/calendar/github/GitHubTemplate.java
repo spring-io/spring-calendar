@@ -1,11 +1,11 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,7 +50,6 @@ class GitHubTemplate implements GitHubOperations {
 	 * {@code password} to authenticate, and the given {@code linkParser} to parse links
 	 * from responses' {@code Link} header. It will use a {@link RestTemplate} created
 	 * from the given {@code restTemplateBuilder}.
-	 *
 	 * @param username the username
 	 * @param password the password
 	 * @param linkParser the link parser
@@ -91,7 +90,7 @@ class GitHubTemplate implements GitHubOperations {
 	@Override
 	public Page<Repository> getPublicRepositories(String organization,
 			Page<Repository> earlierResponse) {
-		String url = earlierResponse != null ? earlierResponse.getUrl()
+		String url = (earlierResponse != null) ? earlierResponse.getUrl()
 				: "https://api.github.com/orgs/" + organization
 						+ "/repos?type=public&per_page=100";
 		return new PageSupplier<Repository>(url, earlierResponse, Repository[].class)
@@ -140,8 +139,8 @@ class GitHubTemplate implements GitHubOperations {
 				return new StandardPage<T>(this.earlierResponse.getContent(), this.url,
 						this.earlierResponse.getEtag(),
 						new PageSupplier<T>(
-								nextEarlierResponse == null ? null
-										: nextEarlierResponse.getUrl(),
+								(nextEarlierResponse != null)
+										? nextEarlierResponse.getUrl() : null,
 								nextEarlierResponse, this.type));
 			}
 			else {
