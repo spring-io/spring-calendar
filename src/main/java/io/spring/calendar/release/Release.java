@@ -91,8 +91,8 @@ public class Release {
 	}
 
 	boolean isOverdue() {
-		return this.status == Status.OPEN && LocalDate.now(ZoneId.of("Europe/London"))
-				.isAfter(LocalDate.parse(this.date));
+		return this.status == Status.OPEN
+				&& LocalDate.now(ZoneId.of("Europe/London")).isAfter(LocalDate.parse(this.date));
 	}
 
 	URL getUrl() {

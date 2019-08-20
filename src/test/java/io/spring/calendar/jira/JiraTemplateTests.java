@@ -41,7 +41,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
  */
 @RestClientTest(components = JiraTemplate.class)
 @RunWith(SpringRunner.class)
-@TestExecutionListeners(mergeMode = MergeMode.MERGE_WITH_DEFAULTS, listeners = TestMethodResponseTestExecutionListener.class)
+@TestExecutionListeners(mergeMode = MergeMode.MERGE_WITH_DEFAULTS,
+		listeners = TestMethodResponseTestExecutionListener.class)
 public class JiraTemplateTests {
 
 	@Autowired
@@ -55,26 +56,21 @@ public class JiraTemplateTests {
 
 	@Test
 	public void getProjects() {
-		this.server.expect(requestTo("https://jira.spring.io/rest/api/2/project"))
-				.andRespond(this.testMethodResponse);
+		this.server.expect(requestTo("https://jira.spring.io/rest/api/2/project")).andRespond(this.testMethodResponse);
 		List<JiraProject> projects = this.jira.getProjects();
 		assertThat(projects).hasSize(92);
 		JiraProject project = projects.get(0);
 		assertThat(project.getKey()).isEqualTo("GREENHOUSE");
 		assertThat(project.getName()).isEqualTo("Greenhouse");
-		assertThat(project.getUri())
-				.isEqualTo(URI.create("https://jira.spring.io/rest/api/2/project/10540"));
+		assertThat(project.getUri()).isEqualTo(URI.create("https://jira.spring.io/rest/api/2/project/10540"));
 	}
 
 	@Test
 	public void getVersions() {
-		this.server
-				.expect(requestTo(
-						"https://jira.spring.io/rest/api/2/project/SPR/versions"))
+		this.server.expect(requestTo("https://jira.spring.io/rest/api/2/project/SPR/versions"))
 				.andRespond(this.testMethodResponse);
-		List<JiraVersion> versions = this.jira
-				.getVersions(new JiraProject("SPR", "Spring Framework",
-						URI.create("https://jira.spring.io/rest/api/2/project/SPR")));
+		List<JiraVersion> versions = this.jira.getVersions(new JiraProject("SPR", "Spring Framework",
+				URI.create("https://jira.spring.io/rest/api/2/project/SPR")));
 		assertThat(versions).hasSize(161);
 		JiraVersion version = versions.get(40);
 		assertThat(version.isReleased()).isEqualTo(true);

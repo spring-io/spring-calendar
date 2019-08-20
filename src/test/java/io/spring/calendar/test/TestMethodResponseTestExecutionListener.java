@@ -27,22 +27,19 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  *
  * @author Andy Wilkinson
  */
-public final class TestMethodResponseTestExecutionListener
-		extends AbstractTestExecutionListener {
+public final class TestMethodResponseTestExecutionListener extends AbstractTestExecutionListener {
 
 	private final TestMethodResponseCreator testMethodResponseCreator = new TestMethodResponseCreator();
 
 	@Override
 	public void beforeTestClass(TestContext testContext) throws Exception {
-		((ConfigurableBeanFactory) testContext.getApplicationContext()
-				.getAutowireCapableBeanFactory()).registerSingleton(
-						"testMethodResponseCreator", this.testMethodResponseCreator);
+		((ConfigurableBeanFactory) testContext.getApplicationContext().getAutowireCapableBeanFactory())
+				.registerSingleton("testMethodResponseCreator", this.testMethodResponseCreator);
 	}
 
 	@Override
 	public void beforeTestMethod(TestContext testContext) throws Exception {
-		this.testMethodResponseCreator.setTest(testContext.getTestClass(),
-				testContext.getTestMethod());
+		this.testMethodResponseCreator.setTest(testContext.getTestClass(), testContext.getTestMethod());
 	}
 
 }

@@ -64,12 +64,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 @RestClientTest
 @RunWith(SpringRunner.class)
-@TestExecutionListeners(mergeMode = MergeMode.MERGE_WITH_DEFAULTS, listeners = TestMethodResponseTestExecutionListener.class)
+@TestExecutionListeners(mergeMode = MergeMode.MERGE_WITH_DEFAULTS,
+		listeners = TestMethodResponseTestExecutionListener.class)
 @ContextConfiguration(classes = TemplateConfiguration.class)
 public class GitHubTemplateTests {
 
-	private final Repository repository = new Repository("spring-boot",
-			"spring-projects/spring-boot",
+	private final Repository repository = new Repository("spring-boot", "spring-projects/spring-boot",
 			"https://api.github.com/repos/spring-projects/spring-boot/milestones",
 			"https://github.com/spring-projects/spring-boot");
 
@@ -87,8 +87,9 @@ public class GitHubTemplateTests {
 
 	@Test
 	public void getMilestones() throws MalformedURLException {
-		this.server.expect(requestTo(
-				"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
+		this.server
+				.expect(requestTo(
+						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
 				.andRespond(this.testMethodResponse);
 		Page<Milestone> page = this.gitHub.getMilestones(this.repository, null);
 		assertThat(page.getContent()).hasSize(68);
@@ -99,27 +100,26 @@ public class GitHubTemplateTests {
 
 	@Test
 	public void getPublicRepositories() throws URISyntaxException, MalformedURLException {
-		this.server.expect(requestTo(
-				"https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
+		this.server.expect(requestTo("https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
 				.andRespond(this.testMethodResponse);
-		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects",
-				null);
+		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects", null);
 		assertThat(page.getContent()).hasSize(30);
-		assertThat(page.getContent().get(0).getMilestonesUrl()).isEqualTo(new URL(
-				"https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones"));
-		assertThat(page.getContent().get(0).getHtmlUrl()).isEqualTo(new URL(
-				"https://github.com/spring-projects/Spring-Integration-in-Action"));
+		assertThat(page.getContent().get(0).getMilestonesUrl()).isEqualTo(
+				new URL("https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones"));
+		assertThat(page.getContent().get(0).getHtmlUrl())
+				.isEqualTo(new URL("https://github.com/spring-projects/Spring-Integration-in-Action"));
 		this.server.verify();
 	}
 
 	@Test
 	public void paging() {
-		this.server.expect(requestTo(
-				"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
+		this.server
+				.expect(requestTo(
+						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
 				.andRespond(response(2, 3));
 		this.server.expect(requestTo(createUrl(2))).andRespond(response(3, 3));
-		this.server.expect(requestTo(createUrl(3))).andRespond(
-				withSuccess().body("[]").contentType(MediaType.APPLICATION_JSON));
+		this.server.expect(requestTo(createUrl(3)))
+				.andRespond(withSuccess().body("[]").contentType(MediaType.APPLICATION_JSON));
 		Page<Milestone> page = this.gitHub.getMilestones(this.repository, null);
 		page.next().next();
 		this.server.verify();
@@ -131,14 +131,11 @@ public class GitHubTemplateTests {
 		this.server.expect(requestTo(originalUrl)).andRespond(response(2, 3, "\"abc\""));
 		this.server.expect(requestTo(createUrl(2))).andRespond(response(3, 3, "\"bcd\""));
 		this.server.expect(requestTo(createUrl(3))).andRespond(response("\"cde\""));
-		this.server.expect(requestTo(originalUrl))
-				.andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"abc\""))
+		this.server.expect(requestTo(originalUrl)).andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"abc\""))
 				.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
-		this.server.expect(requestTo(createUrl(2)))
-				.andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"bcd\""))
+		this.server.expect(requestTo(createUrl(2))).andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"bcd\""))
 				.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
-		this.server.expect(requestTo(createUrl(3)))
-				.andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"cde\""))
+		this.server.expect(requestTo(createUrl(3))).andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"cde\""))
 				.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
 		Page<Milestone> firstPage = this.gitHub.getMilestones(this.repository, null);
 		firstPage.next().next();
@@ -147,17 +144,13 @@ public class GitHubTemplateTests {
 	}
 
 	@Test
-	public void requestIsNotConditionalWhenEarlierContentFilledThePage()
-			throws JsonProcessingException {
+	public void requestIsNotConditionalWhenEarlierContentFilledThePage() throws JsonProcessingException {
 		String originalUrl = "https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100";
-		this.server.expect(requestTo(originalUrl)).andRespond(withSuccess()
-				.body(new ObjectMapper().writeValueAsString(createMilestones(100)))
-				.contentType(MediaType.APPLICATION_JSON));
 		this.server.expect(requestTo(originalUrl))
-				.andExpect(missingHeader("If-None-Match"))
-				.andRespond(withSuccess()
-						.body(new ObjectMapper()
-								.writeValueAsString(createMilestones(100)))
+				.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
+						.contentType(MediaType.APPLICATION_JSON));
+		this.server.expect(requestTo(originalUrl)).andExpect(missingHeader("If-None-Match"))
+				.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
 						.contentType(MediaType.APPLICATION_JSON));
 		Page<Milestone> firstPage = this.gitHub.getMilestones(this.repository, null);
 		this.gitHub.getMilestones(this.repository, firstPage);
@@ -183,8 +176,7 @@ public class GitHubTemplateTests {
 		if (etag != null) {
 			headers.setETag(etag);
 		}
-		return withSuccess().body("[]").headers(headers)
-				.contentType(MediaType.APPLICATION_JSON);
+		return withSuccess().body("[]").headers(headers).contentType(MediaType.APPLICATION_JSON);
 	}
 
 	private ResponseCreator response(String etag) {
@@ -192,19 +184,16 @@ public class GitHubTemplateTests {
 		if (etag != null) {
 			headers.setETag(etag);
 		}
-		return withSuccess().body("[]").headers(headers)
-				.contentType(MediaType.APPLICATION_JSON);
+		return withSuccess().body("[]").headers(headers).contentType(MediaType.APPLICATION_JSON);
 	}
 
 	private String createUrl(int page) {
-		return String.format(
-				"https://api.github.com/repositories/6296790/milestones?state=all&per_page=10&page=%d",
+		return String.format("https://api.github.com/repositories/6296790/milestones?state=all&per_page=10&page=%d",
 				page);
 	}
 
 	private String createLinkHeader(int nextPage, int lastPage) {
-		return String.format("%s, %s", createLink("next", nextPage),
-				createLink("last", lastPage));
+		return String.format("%s, %s", createLink("next", nextPage), createLink("last", lastPage));
 	}
 
 	private String createLink(String rel, int page) {
@@ -214,12 +203,10 @@ public class GitHubTemplateTests {
 	private RequestMatcher missingHeader(final String headerName) {
 		return new RequestMatcher() {
 			@Override
-			public void match(ClientHttpRequest request)
-					throws IOException, AssertionError {
+			public void match(ClientHttpRequest request) throws IOException, AssertionError {
 				List<String> header = request.getHeaders().get(headerName);
 				if (!CollectionUtils.isEmpty(header)) {
-					throw new AssertionError(
-							"Found " + headerName + " header with value " + header);
+					throw new AssertionError("Found " + headerName + " header with value " + header);
 				}
 			}
 		};
@@ -232,9 +219,8 @@ public class GitHubTemplateTests {
 	static class TemplateConfiguration {
 
 		@Bean
-		public GitHubTemplate gitHubTemplate(RestTemplateBuilder restTemplateBuilder) {
-			return new GitHubTemplate("user", "secret", new RegexLinkParser(),
-					restTemplateBuilder);
+		GitHubTemplate gitHubTemplate(RestTemplateBuilder restTemplateBuilder) {
+			return new GitHubTemplate("user", "secret", new RegexLinkParser(), restTemplateBuilder);
 		}
 
 	}

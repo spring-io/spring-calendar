@@ -51,25 +51,23 @@ class ReleaseEventsController {
 	}
 
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	List<Map<String, Object>> releases(@RequestParam String start,
-			@RequestParam String end) throws ParseException {
+	List<Map<String, Object>> releases(@RequestParam String start, @RequestParam String end) throws ParseException {
 		Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(start);
 		Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(end);
-		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream()
-				.map((release) -> {
-					Map<String, Object> event = new HashMap<>();
-					event.put("title", release.getProject() + " " + release.getName());
-					event.put("allDay", true);
-					event.put("start", release.getDate());
-					event.put("url", release.getUrl());
-					if (release.getStatus() == Status.CLOSED) {
-						event.put("backgroundColor", "#6db33f");
-					}
-					else if (release.isOverdue()) {
-						event.put("backgroundColor", "#d14");
-					}
-					return event;
-				}).collect(Collectors.toList());
+		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream().map((release) -> {
+			Map<String, Object> event = new HashMap<>();
+			event.put("title", release.getProject() + " " + release.getName());
+			event.put("allDay", true);
+			event.put("start", release.getDate());
+			event.put("url", release.getUrl());
+			if (release.getStatus() == Status.CLOSED) {
+				event.put("backgroundColor", "#6db33f");
+			}
+			else if (release.isOverdue()) {
+				event.put("backgroundColor", "#d14");
+			}
+			return event;
+		}).collect(Collectors.toList());
 	}
 
 	@ExceptionHandler

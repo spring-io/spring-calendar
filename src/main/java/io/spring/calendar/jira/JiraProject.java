@@ -35,8 +35,7 @@ class JiraProject {
 	private URI uri;
 
 	@JsonCreator
-	JiraProject(@JsonProperty("key") String key, @JsonProperty("name") String name,
-			@JsonProperty("self") URI uri) {
+	JiraProject(@JsonProperty("key") String key, @JsonProperty("name") String name, @JsonProperty("self") URI uri) {
 		this.key = key;
 		this.name = name;
 		this.uri = uri;

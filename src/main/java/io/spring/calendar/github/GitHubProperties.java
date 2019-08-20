@@ -34,7 +34,7 @@ class GitHubProperties {
 
 	private List<String> organizations;
 
-	String getUsername() {
+	public String getUsername() {
 		return this.username;
 	}
 

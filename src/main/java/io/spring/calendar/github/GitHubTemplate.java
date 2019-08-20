@@ -55,24 +55,18 @@ class GitHubTemplate implements GitHubOperations {
 	 * @param linkParser the link parser
 	 * @param restTemplateBuilder the builder
 	 */
-	GitHubTemplate(String username, String password, LinkParser linkParser,
-			RestTemplateBuilder restTemplateBuilder) {
+	GitHubTemplate(String username, String password, LinkParser linkParser, RestTemplateBuilder restTemplateBuilder) {
 		if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-			restTemplateBuilder = restTemplateBuilder.basicAuthentication(username,
-					password);
+			restTemplateBuilder = restTemplateBuilder.basicAuthentication(username, password);
 		}
 		this.rest = restTemplateBuilder.additionalCustomizers((restTemplate) -> {
 			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
 				@Override
 				public void handleError(ClientHttpResponse response) throws IOException {
-					if (response.getStatusCode() == HttpStatus.FORBIDDEN && response
-							.getHeaders().getFirst("X-RateLimit-Remaining").equals("0")) {
-						throw new IllegalStateException(
-								"Rate limit exceeded. Limit will reset at "
-										+ new Date(Long
-												.valueOf(response.getHeaders()
-														.getFirst("X-RateLimit-Reset"))
-												* 1000));
+					if (response.getStatusCode() == HttpStatus.FORBIDDEN
+							&& response.getHeaders().getFirst("X-RateLimit-Remaining").equals("0")) {
+						throw new IllegalStateException("Rate limit exceeded. Limit will reset at "
+								+ new Date(Long.valueOf(response.getHeaders().getFirst("X-RateLimit-Reset")) * 1000));
 					}
 				}
 			});
@@ -81,20 +75,16 @@ class GitHubTemplate implements GitHubOperations {
 	}
 
 	@Override
-	public Page<Milestone> getMilestones(Repository repository,
-			Page<Milestone> earlierResponse) {
+	public Page<Milestone> getMilestones(Repository repository, Page<Milestone> earlierResponse) {
 		String url = repository.getMilestonesUrl().toString() + "?state=all&per_page=100";
 		return new PageSupplier<Milestone>(url, earlierResponse, Milestone[].class).get();
 	}
 
 	@Override
-	public Page<Repository> getPublicRepositories(String organization,
-			Page<Repository> earlierResponse) {
+	public Page<Repository> getPublicRepositories(String organization, Page<Repository> earlierResponse) {
 		String url = (earlierResponse != null) ? earlierResponse.getUrl()
-				: "https://api.github.com/orgs/" + organization
-						+ "/repos?type=public&per_page=100";
-		return new PageSupplier<Repository>(url, earlierResponse, Repository[].class)
-				.get();
+				: "https://api.github.com/orgs/" + organization + "/repos?type=public&per_page=100";
+		return new PageSupplier<Repository>(url, earlierResponse, Repository[].class).get();
 	}
 
 	private class PageSupplier<T> implements Supplier<Page<T>> {
@@ -126,34 +116,28 @@ class GitHubTemplate implements GitHubOperations {
 				return null;
 			}
 			HttpHeaders headers = new HttpHeaders();
-			if (this.earlierResponse != null && (this.earlierResponse.next() != null
-					|| this.earlierResponse.getContent().size() != 100)) {
+			if (this.earlierResponse != null
+					&& (this.earlierResponse.next() != null || this.earlierResponse.getContent().size() != 100)) {
 				headers.setIfNoneMatch(this.earlierResponse.getEtag());
 			}
 
 			ResponseEntity<T[]> response = GitHubTemplate.this.rest
-					.exchange(new RequestEntity<Void>(headers, HttpMethod.GET,
-							URI.create(this.url)), this.type);
+					.exchange(new RequestEntity<Void>(headers, HttpMethod.GET, URI.create(this.url)), this.type);
 			if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
 				Page<T> nextEarlierResponse = this.earlierResponse.next();
-				return new StandardPage<T>(this.earlierResponse.getContent(), this.url,
-						this.earlierResponse.getEtag(),
-						new PageSupplier<T>(
-								(nextEarlierResponse != null)
-										? nextEarlierResponse.getUrl() : null,
+				return new StandardPage<T>(this.earlierResponse.getContent(), this.url, this.earlierResponse.getEtag(),
+						new PageSupplier<T>((nextEarlierResponse != null) ? nextEarlierResponse.getUrl() : null,
 								nextEarlierResponse, this.type));
 			}
 			else {
-				return new StandardPage<T>(Arrays.asList(response.getBody()), this.url,
-						response.getHeaders().getETag(),
+				return new StandardPage<T>(Arrays.asList(response.getBody()), this.url, response.getHeaders().getETag(),
 						new PageSupplier<T>(getNextUrl(response), null, this.type));
 			}
 
 		}
 
 		private String getNextUrl(ResponseEntity<?> response) {
-			return GitHubTemplate.this.linkParser
-					.parse(response.getHeaders().getFirst("Link")).get("next");
+			return GitHubTemplate.this.linkParser.parse(response.getHeaders().getFirst("Link")).get("next");
 		}
 
 	}

@@ -40,16 +40,15 @@ class JiraTemplate implements JiraOperations {
 
 	@Override
 	public List<JiraProject> getProjects() {
-		ResponseEntity<JiraProject[]> entity = this.restTemplate.getForEntity(
-				"https://jira.spring.io/rest/api/2/project", JiraProject[].class);
+		ResponseEntity<JiraProject[]> entity = this.restTemplate
+				.getForEntity("https://jira.spring.io/rest/api/2/project", JiraProject[].class);
 		return Arrays.asList(entity.getBody());
 	}
 
 	@Override
 	public List<JiraVersion> getVersions(JiraProject project) {
 		ResponseEntity<JiraVersion[]> entity;
-		entity = this.restTemplate.getForEntity(project.getUri().toString() + "/versions",
-				JiraVersion[].class);
+		entity = this.restTemplate.getForEntity(project.getUri().toString() + "/versions", JiraVersion[].class);
 		return Arrays.asList(entity.getBody());
 	}
 

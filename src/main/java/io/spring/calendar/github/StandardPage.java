@@ -45,8 +45,7 @@ class StandardPage<T> implements Page<T> {
 	 * @param etag the etag
 	 * @param nextSupplier the supplier of the next page
 	 */
-	StandardPage(List<T> content, String url, String etag,
-			Supplier<Page<T>> nextSupplier) {
+	StandardPage(List<T> content, String url, String etag, Supplier<Page<T>> nextSupplier) {
 		this.content = content;
 		this.url = url;
 		this.etag = etag;

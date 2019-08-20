@@ -40,8 +40,7 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
 	private final JiraProjectFilter jiraProjectFilter;
 
-	JiraProjectReleasesSupplier(JiraOperations jiraOperations,
-			JiraProjectFilter jiraProjectFilter) {
+	JiraProjectReleasesSupplier(JiraOperations jiraOperations, JiraProjectFilter jiraProjectFilter) {
 		this.jiraOperations = jiraOperations;
 		this.jiraProjectFilter = jiraProjectFilter;
 	}
@@ -70,11 +69,9 @@ class JiraProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private Release createRelease(JiraProject project, JiraVersion version) {
 
 		try {
-			return new Release(project.getName(), version.getName(),
-					version.getReleaseDate(), getStatus(version),
-					new URL(String.format(
-							"https://jira.spring.io/browse/%s/fixforversion/%s",
-							project.getKey(), version.getId())));
+			return new Release(project.getName(), version.getName(), version.getReleaseDate(), getStatus(version),
+					new URL(String.format("https://jira.spring.io/browse/%s/fixforversion/%s", project.getKey(),
+							version.getId())));
 		}
 		catch (MalformedURLException ex) {
 			throw new RuntimeException(ex);

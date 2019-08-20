@@ -65,8 +65,7 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private Stream<Repository> getRepositories(String organization) {
 		Page<Repository> page = this.gitHub.getPublicRepositories(organization,
 				this.earlierRepositories.get(organization));
-		this.earlierRepositories.put(organization,
-				this.earlierRepositories.get(organization));
+		this.earlierRepositories.put(organization, this.earlierRepositories.get(organization));
 		return collectContent(page).stream();
 	}
 
@@ -104,8 +103,8 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 			return new Release(project.getDisplayName(), milestone.getTitle(),
 					milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
 							.format(DateTimeFormatter.ISO_LOCAL_DATE),
-					getStatus(milestone), new URL(project.getHtmlUrl().toString()
-							+ "/milestone/" + milestone.getNumber()));
+					getStatus(milestone),
+					new URL(project.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber()));
 		}
 		catch (MalformedURLException ex) {
 			throw new RuntimeException(ex);

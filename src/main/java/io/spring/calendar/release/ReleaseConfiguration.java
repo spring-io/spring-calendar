@@ -30,8 +30,7 @@ import org.springframework.context.annotation.Configuration;
 class ReleaseConfiguration {
 
 	@Bean
-	public StandardProjectNameAliaser projectNameAliaser(
-			ReleaseProperties releaseProperties) {
+	StandardProjectNameAliaser projectNameAliaser(ReleaseProperties releaseProperties) {
 		return new StandardProjectNameAliaser(releaseProperties.getProjectAliases());
 	}
 

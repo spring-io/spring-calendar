@@ -42,10 +42,8 @@ class Repository {
 	private final URL htmlUrl;
 
 	@JsonCreator
-	Repository(@JsonProperty("name") String name,
-			@JsonProperty("full_name") String fullName,
-			@JsonProperty("milestones_url") String milestonesUrl,
-			@JsonProperty("html_url") String htmlUrl) {
+	Repository(@JsonProperty("name") String name, @JsonProperty("full_name") String fullName,
+			@JsonProperty("milestones_url") String milestonesUrl, @JsonProperty("html_url") String htmlUrl) {
 		this.name = name;
 		this.fullName = name;
 		this.displayName = capitalize(name.replace('-', ' '));

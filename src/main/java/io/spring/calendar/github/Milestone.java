@@ -50,8 +50,7 @@ class Milestone {
 	private final long number;
 
 	@JsonCreator
-	Milestone(@JsonProperty("title") String title,
-			@JsonProperty("due_on") ZonedDateTime dueOn,
+	Milestone(@JsonProperty("title") String title, @JsonProperty("due_on") ZonedDateTime dueOn,
 			@JsonProperty("state") State state, @JsonProperty("number") long number) {
 		this.title = title;
 		this.dueOn = (dueOn != null) ? dueOn.withZoneSameInstant(ZoneId.of("UTC")) : null;

@@ -41,10 +41,9 @@ public class TestMethodResponseCreator implements ResponseCreator {
 	private Method testMethod;
 
 	@Override
-	public ClientHttpResponse createResponse(ClientHttpRequest request)
-			throws IOException {
-		return MockRestResponseCreators.withSuccess().body(getCurrentResource())
-				.contentType(MediaType.APPLICATION_JSON).createResponse(request);
+	public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
+		return MockRestResponseCreators.withSuccess().body(getCurrentResource()).contentType(MediaType.APPLICATION_JSON)
+				.createResponse(request);
 	}
 
 	void setTest(Class<?> testClass, Method testMethod) {
@@ -53,8 +52,7 @@ public class TestMethodResponseCreator implements ResponseCreator {
 	}
 
 	private Resource getCurrentResource() {
-		String resourceName = this.testClass.getSimpleName() + "-"
-				+ this.testMethod.getName() + ".json";
+		String resourceName = this.testClass.getSimpleName() + "-" + this.testMethod.getName() + ".json";
 		return new UrlResource(this.testClass.getResource(resourceName));
 	}
 

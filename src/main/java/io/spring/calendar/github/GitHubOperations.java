@@ -39,7 +39,6 @@ interface GitHubOperations {
 	 * perform conditional requests, or {@code null}.
 	 * @return the page of repositories
 	 */
-	Page<Repository> getPublicRepositories(String organization,
-			Page<Repository> earlierResponse);
+	Page<Repository> getPublicRepositories(String organization, Page<Repository> earlierResponse);
 
 }

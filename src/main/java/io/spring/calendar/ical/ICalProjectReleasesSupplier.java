@@ -47,15 +47,13 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
 	@Override
 	public List<ProjectReleases> get() {
-		return this.projects.stream().map(this::createProjectReleases)
-				.collect(Collectors.toList());
+		return this.projects.stream().map(this::createProjectReleases).collect(Collectors.toList());
 	}
 
 	private ProjectReleases createProjectReleases(ICalProject project) {
 		List<Release> releases = parseICalendars(project) //
 				.stream() //
-				.flatMap((calendar) -> calendar.getEvents().stream())
-				.map((event) -> createRelease(project, event))
+				.flatMap((calendar) -> calendar.getEvents().stream()).map((event) -> createRelease(project, event))
 				.collect(Collectors.toList());
 		return new ProjectReleases(project.getName(), releases);
 	}
@@ -86,8 +84,8 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		if (name.startsWith(project.getName())) {
 			name = name.substring(project.getName().length()).trim();
 		}
-		return new Release(project.getName(), name, new SimpleDateFormat("yyyy-MM-dd")
-				.format(event.getDateStart().getValue()), Status.UNKNOWN, null);
+		return new Release(project.getName(), name,
+				new SimpleDateFormat("yyyy-MM-dd").format(event.getDateStart().getValue()), Status.UNKNOWN, null);
 	}
 
 	private static List<ICalProject> createProjects() {

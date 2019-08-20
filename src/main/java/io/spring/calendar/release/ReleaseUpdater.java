@@ -44,15 +44,15 @@ class ReleaseUpdater {
 
 	private final ProjectNameAliaser projectNameAliaser;
 
-	ReleaseUpdater(List<Supplier<List<ProjectReleases>>> projectReleasesSuppliers,
-			ReleaseRepository releaseRepository, ProjectNameAliaser projectNameAliaser) {
+	ReleaseUpdater(List<Supplier<List<ProjectReleases>>> projectReleasesSuppliers, ReleaseRepository releaseRepository,
+			ProjectNameAliaser projectNameAliaser) {
 		this.projectReleasesSuppliers = projectReleasesSuppliers;
 		this.releaseRepository = releaseRepository;
 		this.projectNameAliaser = projectNameAliaser;
 	}
 
 	@Scheduled(fixedRate = 5 * 60 * 1000)
-	public void updateReleases() {
+	void updateReleases() {
 		log.info("Updating releases");
 		Map<String, ProjectReleases> releasesByProject = new HashMap<>();
 		this.projectReleasesSuppliers //
@@ -60,8 +60,8 @@ class ReleaseUpdater {
 				.map(Supplier::get) //
 				.flatMap(List::stream) //
 				.forEach((projectReleases) -> {
-					ProjectReleases existing = releasesByProject
-							.putIfAbsent(projectReleases.getProject(), projectReleases);
+					ProjectReleases existing = releasesByProject.putIfAbsent(projectReleases.getProject(),
+							projectReleases);
 					if (existing != null) {
 						existing.getReleases().addAll(projectReleases.getReleases());
 					}
@@ -75,9 +75,8 @@ class ReleaseUpdater {
 	}
 
 	private Release applyNameAlias(Release release) {
-		return new Release(this.projectNameAliaser.apply(release.getProject()),
-				release.getName(), release.getDate(), release.getStatus(),
-				release.getUrl());
+		return new Release(this.projectNameAliaser.apply(release.getProject()), release.getName(), release.getDate(),
+				release.getStatus(), release.getUrl());
 
 	}
 

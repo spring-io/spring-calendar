@@ -38,15 +38,13 @@ class GitHubConfiguration {
 
 	@Bean
 	GitHubOperations gitHubOperations(RestTemplateBuilder restTemplateBuilder) {
-		return new GitHubTemplate(this.gitHubProperties.getUsername(),
-				this.gitHubProperties.getPassword(), new RegexLinkParser(),
-				restTemplateBuilder);
+		return new GitHubTemplate(this.gitHubProperties.getUsername(), this.gitHubProperties.getPassword(),
+				new RegexLinkParser(), restTemplateBuilder);
 	}
 
 	@Bean
 	GitHubProjectReleasesSupplier releasesSupplier(GitHubOperations gitHubOperations) {
-		return new GitHubProjectReleasesSupplier(gitHubOperations,
-				this.gitHubProperties.getOrganizations());
+		return new GitHubProjectReleasesSupplier(gitHubOperations, this.gitHubProperties.getOrganizations());
 	}
 
 }
