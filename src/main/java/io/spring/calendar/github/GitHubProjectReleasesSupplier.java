@@ -71,7 +71,7 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
 	private ProjectReleases createProjectReleases(Repository repository) {
 		Page<Milestone> page = this.gitHub.getMilestones(repository,
-				this.earlierMilestones.get(repository.getMilestonesUrl()));
+				this.earlierMilestones.get(repository.getFullName()));
 		this.earlierMilestones.put(repository.getFullName(), page);
 		List<Release> releases = getReleases(repository, page);
 		return new ProjectReleases(repository.getDisplayName(), releases);
