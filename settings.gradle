@@ -1,0 +1,16 @@
+pluginManagement {
+	plugins {
+		id 'org.springframework.boot' version '2.1.7.RELEASE'
+	}
+	repositories {
+		gradlePluginPortal()
+		mavenCentral()
+	}
+	resolutionStrategy {
+		eachPlugin {
+			if (requested.id.id == 'io.spring.javaformat') {
+				useModule("io.spring.javaformat:spring-javaformat-gradle-plugin:${javaFormatVersion}")
+			}
+		}
+	}
+}
