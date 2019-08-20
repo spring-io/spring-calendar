@@ -2,16 +2,30 @@
 	<head>
 		<link rel='stylesheet' href='/webjars/fullcalendar/packages/core/main.css' />
 		<link rel='stylesheet' href='/webjars/fullcalendar/packages/daygrid/main.css' />
+		<link rel='stylesheet' href='/webjars/fullcalendar/packages/list/main.css' />
 		<link rel="stylesheet" href="/calendar.css" />
 
 		<script src='/webjars/fullcalendar/packages/core/main.js'></script>
 		<script src='/webjars/fullcalendar/packages/daygrid/main.js'></script>
+		<script src='/webjars/fullcalendar/packages/list/main.js'></script>
 
 		<script>
 		document.addEventListener('DOMContentLoaded', function() {
 			var calendarDiv = document.getElementById('calendar');
 			var calendar = new FullCalendar.Calendar(calendarDiv, {
-				plugins: [ 'dayGrid' ]
+				plugins: [ 'dayGrid', 'list' ],
+				defaultView: 'dayGridMonth',
+				header: {
+					left: 'today prev,next',
+					center: 'title',
+					right: 'dayGridMonth,listMonth'
+				},
+				buttonText: {
+					today: 'Today',
+					month: 'Grid',
+					list: 'List'
+				},
+				allDayText: ''
 			});
 			calendar.addEventSource('/releases');
 			calendar.render();
