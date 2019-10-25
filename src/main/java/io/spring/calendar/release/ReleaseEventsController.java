@@ -59,7 +59,9 @@ class ReleaseEventsController {
 			event.put("title", release.getProject() + " " + release.getName());
 			event.put("allDay", true);
 			event.put("start", release.getDate());
-			event.put("url", release.getUrl());
+			if (release.getUrl() != null) {
+				event.put("url", release.getUrl());
+			}
 			if (release.getStatus() == Status.CLOSED) {
 				event.put("backgroundColor", "#6db33f");
 			}
