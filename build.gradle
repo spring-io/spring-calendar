@@ -24,7 +24,7 @@ dependencies {
 	implementation 'net.sf.biweekly:biweekly:0.6.3'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.webjars:webjars-locator-core'
-	implementation 'org.webjars:fullcalendar:4.2.0'
+	implementation 'org.webjars:fullcalendar:4.3.1'
 	runtime 'org.apache.httpcomponents:httpclient'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
