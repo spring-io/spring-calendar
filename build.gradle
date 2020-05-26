@@ -5,7 +5,6 @@ plugins {
 	id 'org.springframework.boot'
 }
 
-apply plugin: 'io.spring.dependency-management'
 apply plugin: 'io.spring.javaformat'
 
 repositories {
@@ -19,6 +18,7 @@ targetCompatibility = 1.8
 
 dependencies {
 	checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:$javaFormatVersion"
+	implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
 	implementation 'net.sf.biweekly:biweekly:0.6.3'
 	implementation 'org.apache.httpcomponents:httpclient'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
