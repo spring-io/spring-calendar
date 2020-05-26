@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,43 +19,39 @@ package io.spring.calendar.github;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Configuration properties for accessing GitHub.
  *
  * @author Andy Wilkinson
  */
+@ConstructorBinding
 @ConfigurationProperties("calendar.github")
 class GitHubProperties {
 
-	private String username;
+	private final String username;
 
-	private String password;
+	private final String password;
 
-	private List<String> organizations;
+	private final List<String> organizations;
 
-	public String getUsername() {
+	GitHubProperties(String username, String password, List<String> organizations) {
+		this.username = username;
+		this.password = password;
+		this.organizations = organizations;
+	}
+
+	String getUsername() {
 		return this.username;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
+	String getPassword() {
 		return this.password;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public List<String> getOrganizations() {
+	List<String> getOrganizations() {
 		return this.organizations;
-	}
-
-	public void setOrganizations(List<String> organizations) {
-		this.organizations = organizations;
 	}
 
 }

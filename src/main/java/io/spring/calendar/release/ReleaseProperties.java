@@ -19,23 +19,25 @@ package io.spring.calendar.release;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Release-related configuration properties.
  *
  * @author Andy Wilkinson
  */
+@ConstructorBinding
 @ConfigurationProperties(prefix = "calendar.release")
 class ReleaseProperties {
 
-	private Map<String, String> projectAliases;
+	private final Map<String, String> projectAliases;
 
-	public Map<String, String> getProjectAliases() {
-		return this.projectAliases;
+	ReleaseProperties(Map<String, String> projectAliases) {
+		this.projectAliases = projectAliases;
 	}
 
-	public void setProjectAliases(Map<String, String> projectAliases) {
-		this.projectAliases = projectAliases;
+	Map<String, String> getProjectAliases() {
+		return this.projectAliases;
 	}
 
 }
