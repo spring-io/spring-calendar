@@ -29,5 +29,4 @@ dependencies {
 
 checkstyle {
 	configProperties = [ 'checkstyle.config.dir' : file('config/checkstyle') ]
-	toolVersion = '8.22'
 }
