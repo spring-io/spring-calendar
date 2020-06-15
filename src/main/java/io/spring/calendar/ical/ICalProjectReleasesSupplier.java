@@ -91,9 +91,7 @@ class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 	private static List<ICalProject> createProjects() {
 		try {
 			return Arrays.asList(new ICalProject("Spring Data", new URL(
-					"https://calendar.google.com/calendar/ical/pivotal.io_r0vuldu3ka36th4dqvldpetcqs%40group.calendar.google.com/public/basic.ics")),
-					new ICalProject("Spring Data", new URL(
-							"https://outlook.office365.com/owa/calendar/9d3cecb6098e4d7d884561cf288d70b7@vmware.com/4f8a123268f047d0b0b9319040506e2a3791298319254920500/calendar.ics")));
+					"https://outlook.office365.com/owa/calendar/9d3cecb6098e4d7d884561cf288d70b7@vmware.com/4f8a123268f047d0b0b9319040506e2a3791298319254920500/calendar.ics")));
 		}
 		catch (MalformedURLException ex) {
 			throw new IllegalStateException();
