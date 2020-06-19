@@ -16,7 +16,7 @@
 
 package io.spring.calendar.ical;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  * A project available as an iCalendar.
@@ -27,19 +27,19 @@ class ICalProject {
 
 	private final String name;
 
-	private final URL calendarUrl;
+	private final URI calendarUri;
 
-	ICalProject(String name, URL calendarUrl) {
+	ICalProject(String name, URI calendarUri) {
 		this.name = name;
-		this.calendarUrl = calendarUrl;
+		this.calendarUri = calendarUri;
 	}
 
 	String getName() {
 		return this.name;
 	}
 
-	URL getCalendarUrl() {
-		return this.calendarUrl;
+	URI getCalendarUri() {
+		return this.calendarUri;
 	}
 
 }
