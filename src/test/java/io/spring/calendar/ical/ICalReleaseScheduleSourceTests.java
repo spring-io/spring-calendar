@@ -18,7 +18,7 @@ package io.spring.calendar.ical;
 
 import java.util.List;
 
-import io.spring.calendar.release.ProjectReleases;
+import io.spring.calendar.release.ReleaseSchedule;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +32,17 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
- * Tests for {@link ICalProjectReleasesSupplier}.
+ * Tests for {@link ICalReleaseScheduleSource}.
  *
  * @author Andy Wilkinson
  */
-@RestClientTest(components = ICalProjectReleasesSupplier.class)
-class ICalProjectReleasesSupplierTests {
+@RestClientTest(components = ICalReleaseScheduleSource.class)
+class ICalReleaseScheduleSourceTests {
 
 	private static final String SPRING_DATA_CALENDAR = "https://outlook.office365.com/owa/calendar/9d3cecb6098e4d7d884561cf288d70b7@vmware.com/4f8a123268f047d0b0b9319040506e2a3791298319254920500/calendar.ics";
 
 	@Autowired
-	private ICalProjectReleasesSupplier supplier;
+	private ICalReleaseScheduleSource supplier;
 
 	@Autowired
 	private MockRestServiceServer server;
@@ -51,21 +51,21 @@ class ICalProjectReleasesSupplierTests {
 	void iCalCanBeRetrieved() {
 		this.server.expect(requestTo(SPRING_DATA_CALENDAR)).andRespond(withSuccess()
 				.body(new FileSystemResource("src/test/resources/io/spring/calendar/ical/spring-data.ics")));
-		List<ProjectReleases> allProjectReleases = this.supplier.get();
-		assertThat(allProjectReleases).hasSize(1);
-		ProjectReleases projectReleases = allProjectReleases.get(0);
-		assertThat(projectReleases.getProject()).isEqualTo("Spring Data");
-		assertThat(projectReleases.getReleases()).hasSize(6);
+		List<ReleaseSchedule> releaseSchedules = this.supplier.get();
+		assertThat(releaseSchedules).hasSize(1);
+		ReleaseSchedule releaseSchedule = releaseSchedules.get(0);
+		assertThat(releaseSchedule.getProject()).isEqualTo("Spring Data");
+		assertThat(releaseSchedule.getReleases()).hasSize(6);
 	}
 
 	@Test
 	void whenAFailureOccursRetrievingAnICalThenItIsHandledGracefully() {
 		this.server.expect(requestTo(SPRING_DATA_CALENDAR)).andRespond(withServerError());
-		List<ProjectReleases> allProjectReleases = this.supplier.get();
-		assertThat(allProjectReleases).hasSize(1);
-		ProjectReleases projectReleases = allProjectReleases.get(0);
-		assertThat(projectReleases.getProject()).isEqualTo("Spring Data");
-		assertThat(projectReleases.getReleases()).hasSize(0);
+		List<ReleaseSchedule> releaseSchedules = this.supplier.get();
+		assertThat(releaseSchedules).hasSize(1);
+		ReleaseSchedule releaseSchedule = releaseSchedules.get(0);
+		assertThat(releaseSchedule.getProject()).isEqualTo("Spring Data");
+		assertThat(releaseSchedule.getReleases()).hasSize(0);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,23 @@ package io.spring.calendar.release;
 import java.util.List;
 
 /**
- * The {@link Release Releases} for a project.
+ * The schedule of {@link Release releases} for a project.
  *
  * @author Andy Wilkinson
  */
-public final class ProjectReleases {
+public final class ReleaseSchedule {
 
 	private final String project;
 
 	private final List<Release> releases;
 
 	/**
-	 * Creates a new {@code ProjectReleases} for the given {@code project} with the given
+	 * Creates a new {@code ReleaseSchedule} for the given {@code project} with the given
 	 * {@code releases}.
 	 * @param project the project
 	 * @param releases the releases
 	 */
-	public ProjectReleases(String project, List<Release> releases) {
+	public ReleaseSchedule(String project, List<Release> releases) {
 		this.project = project;
 		this.releases = releases;
 	}

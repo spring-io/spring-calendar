@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.spring.calendar.github.Milestone.State;
-import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
+import io.spring.calendar.release.ReleaseSchedule;
+import io.spring.calendar.release.ReleaseScheduleSource;
 
 /**
- * A {@link Supplier} of {@link ProjectReleases} for projects managed on GitHub.
+ * A {@link ReleaseScheduleSource} for projects managed on GitHub.
  *
  * @author Andy Wilkinson
  */
-class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
+class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<String, Page<Milestone>>();
 
@@ -48,17 +48,17 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 
 	private final GitHubOperations gitHub;
 
-	GitHubProjectReleasesSupplier(GitHubOperations gitHub, List<String> organizations) {
+	GitHubReleaseScheduleSource(GitHubOperations gitHub, List<String> organizations) {
 		this.gitHub = gitHub;
 		this.organizations = organizations;
 	}
 
 	@Override
-	public List<ProjectReleases> get() {
+	public List<ReleaseSchedule> get() {
 		return this.organizations //
 				.stream() //
 				.flatMap(this::getRepositories) //
-				.map(this::createProjectReleases) //
+				.map(this::createReleaseSchedule) //
 				.collect(Collectors.toList());
 	}
 
@@ -69,12 +69,12 @@ class GitHubProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
 		return collectContent(page).stream();
 	}
 
-	private ProjectReleases createProjectReleases(Repository repository) {
+	private ReleaseSchedule createReleaseSchedule(Repository repository) {
 		Page<Milestone> page = this.gitHub.getMilestones(repository,
 				this.earlierMilestones.get(repository.getFullName()));
 		this.earlierMilestones.put(repository.getFullName(), page);
 		List<Release> releases = getReleases(repository, page);
-		return new ProjectReleases(repository.getDisplayName(), releases);
+		return new ReleaseSchedule(repository.getDisplayName(), releases);
 	}
 
 	private List<Release> getReleases(Repository repository, Page<Milestone> page) {

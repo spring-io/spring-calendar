@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,15 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import io.spring.calendar.release.ProjectReleases;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
+import io.spring.calendar.release.ReleaseSchedule;
+import io.spring.calendar.release.ReleaseScheduleSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,34 +39,34 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
 /**
- * A {@link Supplier} of {@link ProjectReleases} for {@link ICalProject ICalProjects}.
+ * A {@link ReleaseScheduleSource} for {@link ICalProject ICalProjects}.
  *
  * @author Andy Wilkinson
  */
 @Component
-class ICalProjectReleasesSupplier implements Supplier<List<ProjectReleases>> {
+class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 
-	private final Logger log = LoggerFactory.getLogger(ICalProjectReleasesSupplier.class);
+	private final Logger log = LoggerFactory.getLogger(ICalReleaseScheduleSource.class);
 
 	private final List<ICalProject> projects = createProjects();
 
 	private final RestOperations rest;
 
-	ICalProjectReleasesSupplier(RestTemplateBuilder restTemplateBuilder) {
+	ICalReleaseScheduleSource(RestTemplateBuilder restTemplateBuilder) {
 		this.rest = restTemplateBuilder.build();
 	}
 
 	@Override
-	public List<ProjectReleases> get() {
-		return this.projects.stream().map(this::createProjectReleases).collect(Collectors.toList());
+	public List<ReleaseSchedule> get() {
+		return this.projects.stream().map(this::createReleaseSchedule).collect(Collectors.toList());
 	}
 
-	private ProjectReleases createProjectReleases(ICalProject project) {
+	private ReleaseSchedule createReleaseSchedule(ICalProject project) {
 		List<Release> releases = parseICalendars(project) //
 				.stream() //
 				.flatMap((calendar) -> calendar.getEvents().stream()).map((event) -> createRelease(project, event))
 				.collect(Collectors.toList());
-		return new ProjectReleases(project.getName(), releases);
+		return new ReleaseSchedule(project.getName(), releases);
 	}
 
 	private List<ICalendar> parseICalendars(ICalProject project) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package io.spring.calendar.release;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -38,15 +37,15 @@ class ReleaseUpdater {
 
 	private static final Logger log = LoggerFactory.getLogger(ReleaseUpdater.class);
 
-	private final List<Supplier<List<ProjectReleases>>> projectReleasesSuppliers;
+	private final List<ReleaseScheduleSource> releaseScheduleSources;
 
 	private final ReleaseRepository releaseRepository;
 
 	private final ProjectNameAliaser projectNameAliaser;
 
-	ReleaseUpdater(List<Supplier<List<ProjectReleases>>> projectReleasesSuppliers, ReleaseRepository releaseRepository,
+	ReleaseUpdater(List<ReleaseScheduleSource> releaseScheduleSources, ReleaseRepository releaseRepository,
 			ProjectNameAliaser projectNameAliaser) {
-		this.projectReleasesSuppliers = projectReleasesSuppliers;
+		this.releaseScheduleSources = releaseScheduleSources;
 		this.releaseRepository = releaseRepository;
 		this.projectNameAliaser = projectNameAliaser;
 	}
@@ -54,20 +53,20 @@ class ReleaseUpdater {
 	@Scheduled(fixedRate = 5 * 60 * 1000)
 	void updateReleases() {
 		log.info("Updating releases");
-		Map<String, ProjectReleases> releasesByProject = new HashMap<>();
-		this.projectReleasesSuppliers //
+		Map<String, ReleaseSchedule> releasesByProject = new HashMap<>();
+		this.releaseScheduleSources //
 				.stream() //
-				.map(Supplier::get) //
+				.map(ReleaseScheduleSource::get) //
 				.flatMap(List::stream) //
-				.forEach((projectReleases) -> {
-					ProjectReleases existing = releasesByProject.putIfAbsent(projectReleases.getProject(),
-							projectReleases);
+				.forEach((releaseSchedule) -> {
+					ReleaseSchedule existing = releasesByProject.putIfAbsent(releaseSchedule.getProject(),
+							releaseSchedule);
 					if (existing != null) {
-						existing.getReleases().addAll(projectReleases.getReleases());
+						existing.getReleases().addAll(releaseSchedule.getReleases());
 					}
 				});
 		List<Release> releases = releasesByProject.values().stream()
-				.flatMap((projectReleases) -> projectReleases.getReleases().stream()) //
+				.flatMap((releaseSchedule) -> releaseSchedule.getReleases().stream()) //
 				.map(this::applyNameAlias) //
 				.collect(Collectors.toList());
 		updateReleases(releases);
