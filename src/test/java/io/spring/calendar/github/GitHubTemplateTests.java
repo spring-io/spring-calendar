@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.spring.calendar.github.GitHubTemplateTests.TemplateConfiguration;
 import io.spring.calendar.test.TestMethodResponseCreator;
 import io.spring.calendar.test.TestMethodResponseTestExecutionListener;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
@@ -45,7 +44,6 @@ import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.RequestMatcher;
 import org.springframework.test.web.client.ResponseCreator;
@@ -63,11 +61,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @author Andy Wilkinson
  */
 @RestClientTest
-@RunWith(SpringRunner.class)
 @TestExecutionListeners(mergeMode = MergeMode.MERGE_WITH_DEFAULTS,
 		listeners = TestMethodResponseTestExecutionListener.class)
 @ContextConfiguration(classes = TemplateConfiguration.class)
-public class GitHubTemplateTests {
+class GitHubTemplateTests {
 
 	private final Repository repository = new Repository("spring-boot", "spring-projects/spring-boot",
 			"https://api.github.com/repos/spring-projects/spring-boot/milestones",
@@ -86,7 +83,7 @@ public class GitHubTemplateTests {
 	RestTemplateBuilder restTemplateBuilder;
 
 	@Test
-	public void getMilestones() throws MalformedURLException {
+	void getMilestones() throws MalformedURLException {
 		this.server
 				.expect(requestTo(
 						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
@@ -99,7 +96,7 @@ public class GitHubTemplateTests {
 	}
 
 	@Test
-	public void getPublicRepositories() throws URISyntaxException, MalformedURLException {
+	void getPublicRepositories() throws URISyntaxException, MalformedURLException {
 		this.server.expect(requestTo("https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
 				.andRespond(this.testMethodResponse);
 		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects", null);
@@ -112,7 +109,7 @@ public class GitHubTemplateTests {
 	}
 
 	@Test
-	public void paging() {
+	void paging() {
 		this.server
 				.expect(requestTo(
 						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
@@ -126,7 +123,7 @@ public class GitHubTemplateTests {
 	}
 
 	@Test
-	public void conditionalRequests() {
+	void conditionalRequests() {
 		String originalUrl = "https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100";
 		this.server.expect(requestTo(originalUrl)).andRespond(response(2, 3, "\"abc\""));
 		this.server.expect(requestTo(createUrl(2))).andRespond(response(3, 3, "\"bcd\""));
@@ -144,7 +141,7 @@ public class GitHubTemplateTests {
 	}
 
 	@Test
-	public void requestIsNotConditionalWhenEarlierContentFilledThePage() throws JsonProcessingException {
+	void requestIsNotConditionalWhenEarlierContentFilledThePage() throws JsonProcessingException {
 		String originalUrl = "https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100";
 		this.server.expect(requestTo(originalUrl))
 				.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))

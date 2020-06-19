@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,12 @@ import java.util.List;
 
 import io.spring.calendar.test.TestMethodResponseCreator;
 import io.spring.calendar.test.TestMethodResponseTestExecutionListener;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,10 +38,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
  * @author Andy Wilkinson
  */
 @RestClientTest(components = JiraTemplate.class)
-@RunWith(SpringRunner.class)
 @TestExecutionListeners(mergeMode = MergeMode.MERGE_WITH_DEFAULTS,
 		listeners = TestMethodResponseTestExecutionListener.class)
-public class JiraTemplateTests {
+class JiraTemplateTests {
 
 	@Autowired
 	private JiraTemplate jira;
@@ -55,7 +52,7 @@ public class JiraTemplateTests {
 	private TestMethodResponseCreator testMethodResponse;
 
 	@Test
-	public void getProjects() {
+	void getProjects() {
 		this.server.expect(requestTo("https://jira.spring.io/rest/api/2/project")).andRespond(this.testMethodResponse);
 		List<JiraProject> projects = this.jira.getProjects();
 		assertThat(projects).hasSize(92);
@@ -66,7 +63,7 @@ public class JiraTemplateTests {
 	}
 
 	@Test
-	public void getVersions() {
+	void getVersions() {
 		this.server.expect(requestTo("https://jira.spring.io/rest/api/2/project/SPR/versions"))
 				.andRespond(this.testMethodResponse);
 		List<JiraVersion> versions = this.jira.getVersions(new JiraProject("SPR", "Spring Framework",
