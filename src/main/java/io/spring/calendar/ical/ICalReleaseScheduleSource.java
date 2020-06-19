@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import biweekly.Biweekly;
 import biweekly.ICalendar;
@@ -62,11 +63,13 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private ReleaseSchedule createReleaseSchedule(ICalProject project) {
-		List<Release> releases = parseICalendars(project) //
-				.stream() //
-				.flatMap((calendar) -> calendar.getEvents().stream()).map((event) -> createRelease(project, event))
-				.collect(Collectors.toList());
+		List<Release> releases = parseICalendars(project).stream().flatMap(this::calendarEvents)
+				.map((event) -> createRelease(project, event)).collect(Collectors.toList());
 		return new ReleaseSchedule(project.getName(), releases);
+	}
+
+	private Stream<VEvent> calendarEvents(ICalendar calendar) {
+		return calendar.getEvents().stream();
 	}
 
 	private List<ICalendar> parseICalendars(ICalProject project) {

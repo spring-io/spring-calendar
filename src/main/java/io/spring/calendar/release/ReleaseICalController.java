@@ -47,9 +47,7 @@ class ReleaseICalController {
 	String calendar() throws ParseException {
 		ICalendar calendar = new ICalendar();
 		calendar.setExperimentalProperty("X-WR-CALNAME", "Spring Releases");
-		this.releaseRepository.findAll().stream() //
-				.map(this::createEvent) //
-				.forEach(calendar::addEvent);
+		this.releaseRepository.findAll().stream().map(this::createEvent).forEach(calendar::addEvent);
 		return Biweekly.write(calendar).go();
 	}
 

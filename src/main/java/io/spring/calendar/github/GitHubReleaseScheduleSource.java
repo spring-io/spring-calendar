@@ -55,10 +55,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 	@Override
 	public List<ReleaseSchedule> get() {
-		return this.organizations //
-				.stream() //
-				.flatMap(this::getRepositories) //
-				.map(this::createReleaseSchedule) //
+		return this.organizations.stream().flatMap(this::getRepositories).map(this::createReleaseSchedule)
 				.collect(Collectors.toList());
 	}
 
@@ -78,11 +75,8 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private List<Release> getReleases(Repository repository, Page<Milestone> page) {
-		return collectContent(page) //
-				.stream() //
-				.filter(this::hasReleaseDate) //
-				.map((Milestone milestone) -> createRelease(repository, milestone)) //
-				.collect(Collectors.toList());
+		return collectContent(page).stream().filter(this::hasReleaseDate)
+				.map((Milestone milestone) -> createRelease(repository, milestone)).collect(Collectors.toList());
 	}
 
 	private <T> List<T> collectContent(Page<T> page) {

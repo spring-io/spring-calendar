@@ -47,18 +47,13 @@ class JiraReleaseScheduleSource implements ReleaseScheduleSource {
 
 	@Override
 	public List<ReleaseSchedule> get() {
-		return this.jiraOperations.getProjects() //
-				.stream() //
-				.filter(this.jiraProjectFilter) //
-				.map(this::createReleaseSchedule) //
-				.collect(Collectors.toList());
+		return this.jiraOperations.getProjects().stream().filter(this.jiraProjectFilter)
+				.map(this::createReleaseSchedule).collect(Collectors.toList());
 	}
 
 	private ReleaseSchedule createReleaseSchedule(JiraProject project) {
-		List<Release> releases = this.jiraOperations.getVersions(project).stream() //
-				.filter(this::hasReleaseDate) //
-				.map((version) -> createRelease(project, version)) //
-				.collect(Collectors.toList());
+		List<Release> releases = this.jiraOperations.getVersions(project).stream().filter(this::hasReleaseDate)
+				.map((version) -> createRelease(project, version)).collect(Collectors.toList());
 		return new ReleaseSchedule(project.getName(), releases);
 	}
 

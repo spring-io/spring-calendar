@@ -68,9 +68,7 @@ class InMemoryReleaseRepository implements ReleaseRepository {
 	public List<Release> findAllInPeriod(Date start, Date end) {
 		this.lock.readLock().lock();
 		try {
-			return this.releases.stream() //
-					.filter(isWithinPeriod(start, end)) //
-					.collect(Collectors.toList());
+			return this.releases.stream().filter(isWithinPeriod(start, end)).collect(Collectors.toList());
 		}
 		finally {
 			this.lock.readLock().unlock();

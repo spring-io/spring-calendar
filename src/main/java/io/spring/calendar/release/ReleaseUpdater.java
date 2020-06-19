@@ -53,30 +53,30 @@ class ReleaseUpdater {
 	@Scheduled(fixedRate = 5 * 60 * 1000)
 	void updateReleases() {
 		log.info("Updating releases");
-		Map<String, ReleaseSchedule> releasesByProject = new HashMap<>();
-		this.releaseScheduleSources //
-				.stream() //
-				.map(ReleaseScheduleSource::get) //
-				.flatMap(List::stream) //
-				.forEach((releaseSchedule) -> {
-					ReleaseSchedule existing = releasesByProject.putIfAbsent(releaseSchedule.getProject(),
-							releaseSchedule);
-					if (existing != null) {
-						existing.getReleases().addAll(releaseSchedule.getReleases());
-					}
-				});
-		List<Release> releases = releasesByProject.values().stream()
-				.flatMap((releaseSchedule) -> releaseSchedule.getReleases().stream()) //
-				.map(this::applyNameAlias) //
+		List<Release> releases = getReleaseSchedulesByProject().values().stream()
+				.flatMap((releaseSchedule) -> releaseSchedule.getReleases().stream()).map(this::applyNameAlias)
 				.collect(Collectors.toList());
 		updateReleases(releases);
 		log.info("Releases updated");
 	}
 
+	private Map<String, ReleaseSchedule> getReleaseSchedulesByProject() {
+		Map<String, ReleaseSchedule> schedulesByProject = new HashMap<>();
+		this.releaseScheduleSources.stream().map(ReleaseScheduleSource::get).flatMap(List::stream)
+				.forEach((releaseSchedule) -> collect(schedulesByProject, releaseSchedule));
+		return schedulesByProject;
+	}
+
+	private void collect(Map<String, ReleaseSchedule> schedulesByProject, ReleaseSchedule schedule) {
+		ReleaseSchedule existing = schedulesByProject.putIfAbsent(schedule.getProject(), schedule);
+		if (existing != null) {
+			existing.getReleases().addAll(schedule.getReleases());
+		}
+	}
+
 	private Release applyNameAlias(Release release) {
 		return new Release(this.projectNameAliaser.apply(release.getProject()), release.getName(), release.getDate(),
 				release.getStatus(), release.getUrl());
-
 	}
 
 	private void updateReleases(List<Release> releases) {
