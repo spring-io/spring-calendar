@@ -1,22 +1,17 @@
 <html>
 	<head>
-		<link rel='stylesheet' href='/webjars/fullcalendar/core/main.css' />
-		<link rel='stylesheet' href='/webjars/fullcalendar/daygrid/main.css' />
-		<link rel='stylesheet' href='/webjars/fullcalendar/list/main.css' />
+		<link rel='stylesheet' href='/webjars/fullcalendar/5.10.1/main.css' />
 		<link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" type="text/css">
 		<link rel="stylesheet" href="/calendar.css" />
 
-		<script src='/webjars/fullcalendar/core/main.js'></script>
-		<script src='/webjars/fullcalendar/daygrid/main.js'></script>
-		<script src='/webjars/fullcalendar/list/main.js'></script>
+		<script src='/webjars/fullcalendar/5.10.1/main.js'></script>
 
 		<script>
 		document.addEventListener('DOMContentLoaded', function() {
 			var calendarDiv = document.getElementById('calendar');
 			var calendar = new FullCalendar.Calendar(calendarDiv, {
-				plugins: [ 'dayGrid', 'list' ],
-				defaultView: 'dayGridMonth',
-				header: {
+				initialView: 'dayGridMonth',
+				headerToolbar: {
 					left: 'today prev,next',
 					center: 'title',
 					right: 'dayGridMonth,listMonth'
