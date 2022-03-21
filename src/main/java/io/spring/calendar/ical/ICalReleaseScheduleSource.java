@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,6 +55,8 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 
 	private final RestOperations rest;
 
+	private final Map<ICalProject, List<ICalendar>> previousCalendars = new HashMap<>();
+
 	ICalReleaseScheduleSource(RestTemplateBuilder restTemplateBuilder) {
 		this.rest = restTemplateBuilder.build();
 	}
@@ -65,7 +69,8 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 	private ReleaseSchedule createReleaseSchedule(ICalProject project) {
 		List<Release> releases = parseICalendars(project).stream().flatMap(this::calendarEvents)
 				.map((event) -> createRelease(project, event)).collect(Collectors.toList());
-		return new ReleaseSchedule(project.getName(), releases);
+		ReleaseSchedule releaseSchedule = new ReleaseSchedule(project.getName(), releases);
+		return releaseSchedule;
 	}
 
 	private Stream<VEvent> calendarEvents(ICalendar calendar) {
@@ -74,11 +79,14 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 
 	private List<ICalendar> parseICalendars(ICalProject project) {
 		try {
-			return Biweekly.parse(this.rest.getForObject(project.getCalendarUri(), String.class)).all();
+			List<ICalendar> calendars = Biweekly.parse(this.rest.getForObject(project.getCalendarUri(), String.class))
+					.all();
+			this.previousCalendars.put(project, calendars);
+			return calendars;
 		}
 		catch (RestClientException ex) {
 			this.log.warn("Failed to retrieve calendar from '{}'", project.getCalendarUri(), ex);
-			return Collections.emptyList();
+			return this.previousCalendars.getOrDefault(project, Collections.emptyList());
 		}
 	}
 
