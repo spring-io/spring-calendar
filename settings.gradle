@@ -1,6 +1,6 @@
 pluginManagement {
 	plugins {
-		id 'org.springframework.boot' version '2.6.4'
+		id 'org.springframework.boot' version '2.6.6'
 	}
 	repositories {
 		gradlePluginPortal()
