@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.Date;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import io.spring.calendar.release.Release.Status;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,9 +57,6 @@ class ReleaseICalController {
 			Date date = new SimpleDateFormat("yyyy-MM-dd").parse(release.getDate());
 			event.setDateStart(date, false);
 			event.setDateEnd(date, false);
-			if (release.getStatus() == Status.CLOSED) {
-				event.setStatus(biweekly.property.Status.completed());
-			}
 		}
 		catch (ParseException ex) {
 			throw new RuntimeException(ex);
