@@ -1,16 +1,10 @@
 pluginManagement {
 	plugins {
 		id 'org.springframework.boot' version '2.7.1'
+		id 'io.spring.javaformat' version "$javaFormatVersion"
 	}
 	repositories {
 		gradlePluginPortal()
 		mavenCentral()
-	}
-	resolutionStrategy {
-		eachPlugin {
-			if (requested.id.id == 'io.spring.javaformat') {
-				useModule("io.spring.javaformat:spring-javaformat-gradle-plugin:${javaFormatVersion}")
-			}
-		}
 	}
 }
