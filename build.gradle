@@ -9,10 +9,14 @@ repositories {
 	mavenCentral()
 }
 
-archivesBaseName = 'spring-calendar'
+base {
+	archivesName = 'spring-calendar'
+}
 
-sourceCompatibility = 17
-targetCompatibility = 17
+java {
+	sourceCompatibility = 17
+	targetCompatibility = 17
+}
 
 dependencies {
 	checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:$javaFormatVersion"
@@ -25,6 +29,7 @@ dependencies {
 	runtimeOnly platform('com.azure.spring:spring-cloud-azure-dependencies:5.7.0')
 	runtimeOnly 'com.azure.spring:spring-cloud-azure-starter-keyvault-secrets'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 checkstyle {
