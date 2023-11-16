@@ -8,9 +8,11 @@
 
 		<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			var calendarDiv = document.getElementById('calendar');
-			var calendar = new FullCalendar.Calendar(calendarDiv, {
+			const calendarDiv = document.getElementById('calendar');
+			const initialDate = new URLSearchParams(window.location.search).get('initialDate')
+			const calendar = new FullCalendar.Calendar(calendarDiv, {
 				initialView: 'dayGridMonth',
+				initialDate: initialDate,
 				headerToolbar: {
 					left: 'today prev,next',
 					center: 'title',
