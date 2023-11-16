@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ class GitHubTemplate implements GitHubOperations {
 			}
 
 			ResponseEntity<T[]> response = GitHubTemplate.this.rest
-					.exchange(new RequestEntity<Void>(headers, HttpMethod.GET, URI.create(this.url)), this.type);
+				.exchange(new RequestEntity<Void>(headers, HttpMethod.GET, URI.create(this.url)), this.type);
 			if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
 				Page<T> nextEarlierResponse = this.earlierResponse.next();
 				return new StandardPage<T>(this.earlierResponse.getContent(), this.url, this.earlierResponse.getEtag(),

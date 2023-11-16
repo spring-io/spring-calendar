@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,10 @@ public class TestMethodResponseCreator implements ResponseCreator {
 
 	@Override
 	public ClientHttpResponse createResponse(ClientHttpRequest request) throws IOException {
-		return MockRestResponseCreators.withSuccess().body(getCurrentResource()).contentType(MediaType.APPLICATION_JSON)
-				.createResponse(request);
+		return MockRestResponseCreators.withSuccess()
+			.body(getCurrentResource())
+			.contentType(MediaType.APPLICATION_JSON)
+			.createResponse(request);
 	}
 
 	void setTest(Class<?> testClass, Method testMethod) {

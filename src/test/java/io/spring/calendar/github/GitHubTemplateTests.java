@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,9 +85,9 @@ class GitHubTemplateTests {
 	@Test
 	void getMilestones() throws MalformedURLException {
 		this.server
-				.expect(requestTo(
-						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
-				.andRespond(this.testMethodResponse);
+			.expect(requestTo(
+					"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
+			.andRespond(this.testMethodResponse);
 		Page<Milestone> page = this.gitHub.getMilestones(this.repository, null);
 		assertThat(page.getContent()).hasSize(68);
 		this.server.verify();
@@ -98,25 +98,25 @@ class GitHubTemplateTests {
 	@Test
 	void getPublicRepositories() throws URISyntaxException, MalformedURLException {
 		this.server.expect(requestTo("https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
-				.andRespond(this.testMethodResponse);
+			.andRespond(this.testMethodResponse);
 		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects", null);
 		assertThat(page.getContent()).hasSize(30);
-		assertThat(page.getContent().get(0).getMilestonesUrl()).isEqualTo(
-				new URL("https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones"));
+		assertThat(page.getContent().get(0).getMilestonesUrl())
+			.isEqualTo(new URL("https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones"));
 		assertThat(page.getContent().get(0).getHtmlUrl())
-				.isEqualTo(new URL("https://github.com/spring-projects/Spring-Integration-in-Action"));
+			.isEqualTo(new URL("https://github.com/spring-projects/Spring-Integration-in-Action"));
 		this.server.verify();
 	}
 
 	@Test
 	void paging() {
 		this.server
-				.expect(requestTo(
-						"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
-				.andRespond(response(2, 3));
+			.expect(requestTo(
+					"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
+			.andRespond(response(2, 3));
 		this.server.expect(requestTo(createUrl(2))).andRespond(response(3, 3));
 		this.server.expect(requestTo(createUrl(3)))
-				.andRespond(withSuccess().body("[]").contentType(MediaType.APPLICATION_JSON));
+			.andRespond(withSuccess().body("[]").contentType(MediaType.APPLICATION_JSON));
 		Page<Milestone> page = this.gitHub.getMilestones(this.repository, null);
 		page.next().next();
 		this.server.verify();
@@ -128,12 +128,15 @@ class GitHubTemplateTests {
 		this.server.expect(requestTo(originalUrl)).andRespond(response(2, 3, "\"abc\""));
 		this.server.expect(requestTo(createUrl(2))).andRespond(response(3, 3, "\"bcd\""));
 		this.server.expect(requestTo(createUrl(3))).andRespond(response("\"cde\""));
-		this.server.expect(requestTo(originalUrl)).andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"abc\""))
-				.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
-		this.server.expect(requestTo(createUrl(2))).andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"bcd\""))
-				.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
-		this.server.expect(requestTo(createUrl(3))).andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"cde\""))
-				.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
+		this.server.expect(requestTo(originalUrl))
+			.andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"abc\""))
+			.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
+		this.server.expect(requestTo(createUrl(2)))
+			.andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"bcd\""))
+			.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
+		this.server.expect(requestTo(createUrl(3)))
+			.andExpect(header(HttpHeaders.IF_NONE_MATCH, "\"cde\""))
+			.andRespond(withStatus(HttpStatus.NOT_MODIFIED));
 		Page<Milestone> firstPage = this.gitHub.getMilestones(this.repository, null);
 		firstPage.next().next();
 		this.gitHub.getMilestones(this.repository, firstPage).next().next();
@@ -144,11 +147,12 @@ class GitHubTemplateTests {
 	void requestIsNotConditionalWhenEarlierContentFilledThePage() throws JsonProcessingException {
 		String originalUrl = "https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100";
 		this.server.expect(requestTo(originalUrl))
-				.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
-						.contentType(MediaType.APPLICATION_JSON));
-		this.server.expect(requestTo(originalUrl)).andExpect(missingHeader("If-None-Match"))
-				.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
-						.contentType(MediaType.APPLICATION_JSON));
+			.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
+				.contentType(MediaType.APPLICATION_JSON));
+		this.server.expect(requestTo(originalUrl))
+			.andExpect(missingHeader("If-None-Match"))
+			.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
+				.contentType(MediaType.APPLICATION_JSON));
 		Page<Milestone> firstPage = this.gitHub.getMilestones(this.repository, null);
 		this.gitHub.getMilestones(this.repository, firstPage);
 		this.server.verify();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,8 @@ class ICalReleaseScheduleSourceTests {
 
 	@Test
 	void iCalCanBeRetrieved() {
-		this.server.expect(requestTo(SPRING_DATA_CALENDAR)).andRespond(withSuccess()
+		this.server.expect(requestTo(SPRING_DATA_CALENDAR))
+			.andRespond(withSuccess()
 				.body(new FileSystemResource("src/test/resources/io/spring/calendar/ical/spring-data.ics")));
 		List<ReleaseSchedule> releaseSchedules = this.supplier.get();
 		assertThat(releaseSchedules).hasSize(1);
@@ -74,7 +75,8 @@ class ICalReleaseScheduleSourceTests {
 
 	@Test
 	void whenAFailureOccursRetrievingAnICalWithPreviousResultsThenThosePreviousResultsAreReturned() {
-		this.server.expect(requestTo(SPRING_DATA_CALENDAR)).andRespond(withSuccess()
+		this.server.expect(requestTo(SPRING_DATA_CALENDAR))
+			.andRespond(withSuccess()
 				.body(new FileSystemResource("src/test/resources/io/spring/calendar/ical/spring-data.ics")));
 		this.server.expect(requestTo(SPRING_DATA_CALENDAR)).andRespond(withServerError());
 		this.supplier.get();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,17 +53,21 @@ class ReleaseUpdater {
 	@Scheduled(fixedRate = 5 * 60 * 1000)
 	void updateReleases() {
 		log.info("Updating releases");
-		List<Release> releases = getReleaseSchedulesByProject().values().stream()
-				.flatMap((releaseSchedule) -> releaseSchedule.getReleases().stream()).map(this::applyNameAlias)
-				.collect(Collectors.toList());
+		List<Release> releases = getReleaseSchedulesByProject().values()
+			.stream()
+			.flatMap((releaseSchedule) -> releaseSchedule.getReleases().stream())
+			.map(this::applyNameAlias)
+			.collect(Collectors.toList());
 		updateReleases(releases);
 		log.info("Releases updated");
 	}
 
 	private Map<String, ReleaseSchedule> getReleaseSchedulesByProject() {
 		Map<String, ReleaseSchedule> schedulesByProject = new HashMap<>();
-		this.releaseScheduleSources.stream().map(ReleaseScheduleSource::get).flatMap(List::stream)
-				.forEach((releaseSchedule) -> collect(schedulesByProject, releaseSchedule));
+		this.releaseScheduleSources.stream()
+			.map(ReleaseScheduleSource::get)
+			.flatMap(List::stream)
+			.forEach((releaseSchedule) -> collect(schedulesByProject, releaseSchedule));
 		return schedulesByProject;
 	}
 

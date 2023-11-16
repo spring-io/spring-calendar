@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,10 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 	@Override
 	public List<ReleaseSchedule> get() {
-		return this.organizations.stream().flatMap(this::getRepositories).map(this::createReleaseSchedule)
-				.collect(Collectors.toList());
+		return this.organizations.stream()
+			.flatMap(this::getRepositories)
+			.map(this::createReleaseSchedule)
+			.collect(Collectors.toList());
 	}
 
 	private Stream<Repository> getRepositories(String organization) {
@@ -75,8 +77,10 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private List<Release> getReleases(Repository repository, Page<Milestone> page) {
-		return collectContent(page).stream().filter(this::hasReleaseDate)
-				.map((Milestone milestone) -> createRelease(repository, milestone)).collect(Collectors.toList());
+		return collectContent(page).stream()
+			.filter(this::hasReleaseDate)
+			.map((Milestone milestone) -> createRelease(repository, milestone))
+			.collect(Collectors.toList());
 	}
 
 	private <T> List<T> collectContent(Page<T> page) {
@@ -95,8 +99,9 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	private Release createRelease(Repository project, Milestone milestone) {
 		try {
 			return new Release(project.getDisplayName(), milestone.getTitle(),
-					milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London"))
-							.format(DateTimeFormatter.ISO_LOCAL_DATE),
+					milestone.getDueOn()
+						.withZoneSameInstant(ZoneId.of("Europe/London"))
+						.format(DateTimeFormatter.ISO_LOCAL_DATE),
 					getStatus(milestone),
 					new URL(project.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber()));
 		}

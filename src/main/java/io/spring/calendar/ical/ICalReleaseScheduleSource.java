@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,8 +67,10 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private ReleaseSchedule createReleaseSchedule(ICalProject project) {
-		List<Release> releases = parseICalendars(project).stream().flatMap(this::calendarEvents)
-				.map((event) -> createRelease(project, event)).collect(Collectors.toList());
+		List<Release> releases = parseICalendars(project).stream()
+			.flatMap(this::calendarEvents)
+			.map((event) -> createRelease(project, event))
+			.collect(Collectors.toList());
 		ReleaseSchedule releaseSchedule = new ReleaseSchedule(project.getName(), releases);
 		return releaseSchedule;
 	}
@@ -80,7 +82,7 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 	private List<ICalendar> parseICalendars(ICalProject project) {
 		try {
 			List<ICalendar> calendars = Biweekly.parse(this.rest.getForObject(project.getCalendarUri(), String.class))
-					.all();
+				.all();
 			this.previousCalendars.put(project, calendars);
 			return calendars;
 		}
