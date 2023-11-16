@@ -18,15 +18,13 @@ dependencies {
 	checkstyle "io.spring.javaformat:spring-javaformat-checkstyle:$javaFormatVersion"
 	implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
 	implementation 'net.sf.biweekly:biweekly:0.6.6'
-	implementation 'org.apache.httpcomponents:httpclient'
+	implementation 'org.apache.httpcomponents.client5:httpclient5'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.webjars:webjars-locator-core'
 	implementation 'org.webjars:fullcalendar:5.10.1'
-	runtimeOnly platform('com.azure.spring:spring-cloud-azure-dependencies:4.5.0')
+	runtimeOnly platform('com.azure.spring:spring-cloud-azure-dependencies:5.7.0')
 	runtimeOnly 'com.azure.spring:spring-cloud-azure-starter-keyvault-secrets'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: "org.junit.vintage"
-	}
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 checkstyle {

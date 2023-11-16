@@ -16,9 +16,13 @@
 
 package io.spring.calendar;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -43,12 +47,16 @@ public class SpringCalendar {
 	@Bean
 	public RestTemplateCustomizer httpClientTimeoutRestTemplateCustomizer() {
 		return (restTemplate) -> {
-			RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectTimeout(30000)
-				.setConnectionRequestTimeout(30000)
-				.setSocketTimeout(30000)
+			CloseableHttpClient httpClient = HttpClientBuilder.create()
+				.setDefaultRequestConfig(
+						RequestConfig.custom().setConnectionRequestTimeout(30, TimeUnit.SECONDS).build())
+				.setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+					.setDefaultConnectionConfig(ConnectionConfig.custom()
+						.setConnectTimeout(30, TimeUnit.SECONDS)
+						.setSocketTimeout(30, TimeUnit.SECONDS)
+						.build())
+					.build())
 				.build();
-			CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
 			HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(
 					httpClient);
 			restTemplate.setRequestFactory(requestFactory);
