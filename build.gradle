@@ -25,7 +25,7 @@ dependencies {
 	implementation 'org.apache.httpcomponents.client5:httpclient5'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.webjars:webjars-locator-core'
-	implementation 'org.webjars:fullcalendar:5.10.1'
+	implementation 'org.webjars:fullcalendar:5.11.3'
 	runtimeOnly platform('com.azure.spring:spring-cloud-azure-dependencies:5.7.0')
 	runtimeOnly 'com.azure.spring:spring-cloud-azure-starter-keyvault-secrets'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
