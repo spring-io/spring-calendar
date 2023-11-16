@@ -16,6 +16,7 @@
 
 package io.spring.calendar.release;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public final class ReleaseSchedule {
 	 */
 	public ReleaseSchedule(String project, List<Release> releases) {
 		this.project = project;
-		this.releases = releases;
+		this.releases = new ArrayList<>(releases);
 	}
 
 	/**
