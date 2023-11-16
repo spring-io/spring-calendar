@@ -77,14 +77,14 @@ class GitHubTemplate implements GitHubOperations {
 	@Override
 	public Page<Milestone> getMilestones(Repository repository, Page<Milestone> earlierResponse) {
 		String url = repository.getMilestonesUrl().toString() + "?state=all&per_page=100";
-		return new PageSupplier<Milestone>(url, earlierResponse, Milestone[].class).get();
+		return new PageSupplier<>(url, earlierResponse, Milestone[].class).get();
 	}
 
 	@Override
 	public Page<Repository> getPublicRepositories(String organization, Page<Repository> earlierResponse) {
 		String url = (earlierResponse != null) ? earlierResponse.getUrl()
 				: "https://api.github.com/orgs/" + organization + "/repos?type=public&per_page=100";
-		return new PageSupplier<Repository>(url, earlierResponse, Repository[].class).get();
+		return new PageSupplier<>(url, earlierResponse, Repository[].class).get();
 	}
 
 	private class PageSupplier<T> implements Supplier<Page<T>> {
@@ -122,16 +122,16 @@ class GitHubTemplate implements GitHubOperations {
 			}
 
 			ResponseEntity<T[]> response = GitHubTemplate.this.rest
-				.exchange(new RequestEntity<Void>(headers, HttpMethod.GET, URI.create(this.url)), this.type);
+				.exchange(new RequestEntity<>(headers, HttpMethod.GET, URI.create(this.url)), this.type);
 			if (response.getStatusCode() == HttpStatus.NOT_MODIFIED) {
 				Page<T> nextEarlierResponse = this.earlierResponse.next();
-				return new StandardPage<T>(this.earlierResponse.getContent(), this.url, this.earlierResponse.getEtag(),
-						new PageSupplier<T>((nextEarlierResponse != null) ? nextEarlierResponse.getUrl() : null,
+				return new StandardPage<>(this.earlierResponse.getContent(), this.url, this.earlierResponse.getEtag(),
+						new PageSupplier<>((nextEarlierResponse != null) ? nextEarlierResponse.getUrl() : null,
 								nextEarlierResponse, this.type));
 			}
 			else {
-				return new StandardPage<T>(Arrays.asList(response.getBody()), this.url, response.getHeaders().getETag(),
-						new PageSupplier<T>(getNextUrl(response), null, this.type));
+				return new StandardPage<>(Arrays.asList(response.getBody()), this.url, response.getHeaders().getETag(),
+						new PageSupplier<>(getNextUrl(response), null, this.type));
 			}
 
 		}

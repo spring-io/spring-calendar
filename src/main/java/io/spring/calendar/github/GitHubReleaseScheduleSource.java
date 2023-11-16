@@ -40,9 +40,9 @@ import io.spring.calendar.release.ReleaseScheduleSource;
  */
 class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
-	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<String, Page<Milestone>>();
+	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<>();
 
-	private final Map<String, Page<Repository>> earlierRepositories = new HashMap<String, Page<Repository>>();
+	private final Map<String, Page<Repository>> earlierRepositories = new HashMap<>();
 
 	private final List<String> organizations;
 
@@ -84,7 +84,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private <T> List<T> collectContent(Page<T> page) {
-		List<T> content = new ArrayList<T>();
+		List<T> content = new ArrayList<>();
 		while (page != null) {
 			content.addAll(page.getContent());
 			page = page.next();
