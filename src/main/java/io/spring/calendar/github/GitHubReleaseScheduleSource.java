@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.spring.calendar.github.Milestone.State;
@@ -55,10 +54,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 	@Override
 	public List<ReleaseSchedule> get() {
-		return this.organizations.stream()
-			.flatMap(this::getRepositories)
-			.map(this::createReleaseSchedule)
-			.collect(Collectors.toList());
+		return this.organizations.stream().flatMap(this::getRepositories).map(this::createReleaseSchedule).toList();
 	}
 
 	private Stream<Repository> getRepositories(String organization) {
@@ -80,7 +76,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 		return collectContent(page).stream()
 			.filter(this::hasReleaseDate)
 			.map((Milestone milestone) -> createRelease(repository, milestone))
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	private <T> List<T> collectContent(Page<T> page) {
