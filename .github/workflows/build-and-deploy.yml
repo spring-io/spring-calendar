@@ -29,7 +29,7 @@ jobs:
       - name: Set up Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_SPRING_TEAM }}
 
       - name: Set up Azure Spring Extension
         run: az extension add --name spring
