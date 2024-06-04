@@ -5,8 +5,7 @@ spring:
 
 calendar:
   github:
-    username: ${calendar-github-username}
-    password: ${calendar-github-password}
+    token: ${calendar-github-token}
     organizations:
       - micrometer-metrics
       - r2dbc

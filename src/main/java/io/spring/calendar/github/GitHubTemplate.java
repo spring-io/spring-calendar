@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,18 +46,17 @@ class GitHubTemplate implements GitHubOperations {
 	private final LinkParser linkParser;
 
 	/**
-	 * Creates a new {@code GitHubTemplate} that will use the given {@code username} and
-	 * {@code password} to authenticate, and the given {@code linkParser} to parse links
-	 * from responses' {@code Link} header. It will use a {@link RestTemplate} created
-	 * from the given {@code restTemplateBuilder}.
-	 * @param username the username
-	 * @param password the password
+	 * Creates a new {@code GitHubTemplate} that will use the given {@code token} to
+	 * authenticate, and the given {@code linkParser} to parse links from responses'
+	 * {@code Link} header. It will use a {@link RestTemplate} created from the given
+	 * {@code restTemplateBuilder}.
+	 * @param token the token
 	 * @param linkParser the link parser
 	 * @param restTemplateBuilder the builder
 	 */
-	GitHubTemplate(String username, String password, LinkParser linkParser, RestTemplateBuilder restTemplateBuilder) {
-		if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
-			restTemplateBuilder = restTemplateBuilder.basicAuthentication(username, password);
+	GitHubTemplate(String token, LinkParser linkParser, RestTemplateBuilder restTemplateBuilder) {
+		if (StringUtils.hasText(token)) {
+			restTemplateBuilder = restTemplateBuilder.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 		}
 		this.rest = restTemplateBuilder.additionalCustomizers((restTemplate) -> {
 			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {

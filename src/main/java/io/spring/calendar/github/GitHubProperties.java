@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,24 +28,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("calendar.github")
 class GitHubProperties {
 
-	private final String username;
-
-	private final String password;
+	private final String token;
 
 	private final List<String> organizations;
 
-	GitHubProperties(String username, String password, List<String> organizations) {
-		this.username = username;
-		this.password = password;
+	GitHubProperties(String token, List<String> organizations) {
+		this.token = token;
 		this.organizations = organizations;
 	}
 
-	String getUsername() {
-		return this.username;
-	}
-
-	String getPassword() {
-		return this.password;
+	String getToken() {
+		return this.token;
 	}
 
 	List<String> getOrganizations() {
