@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import io.spring.calendar.github.Milestone.State;
+import io.spring.calendar.github.Repository.Visibility;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
 import io.spring.calendar.release.ReleaseSchedule;
@@ -54,14 +55,21 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 	@Override
 	public List<ReleaseSchedule> get() {
-		return this.organizations.stream().flatMap(this::getRepositories).map(this::createReleaseSchedule).toList();
+		return this.organizations.stream()
+			.flatMap(this::getRepositories)
+			.filter(this::include)
+			.map(this::createReleaseSchedule)
+			.toList();
 	}
 
 	private Stream<Repository> getRepositories(String organization) {
-		Page<Repository> page = this.gitHub.getPublicRepositories(organization,
-				this.earlierRepositories.get(organization));
+		Page<Repository> page = this.gitHub.getRepositories(organization, this.earlierRepositories.get(organization));
 		this.earlierRepositories.put(organization, this.earlierRepositories.get(organization));
 		return collectContent(page).stream();
+	}
+
+	private boolean include(Repository repository) {
+		return (repository.getVisibility() == Visibility.PUBLIC) || repository.getName().endsWith("-commercial");
 	}
 
 	private ReleaseSchedule createReleaseSchedule(Repository repository) {
@@ -98,8 +106,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 					milestone.getDueOn()
 						.withZoneSameInstant(ZoneId.of("Europe/London"))
 						.format(DateTimeFormatter.ISO_LOCAL_DATE),
-					getStatus(milestone),
-					new URL(project.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber()));
+					getStatus(milestone), getUrl(project, milestone));
 		}
 		catch (MalformedURLException ex) {
 			throw new RuntimeException(ex);
@@ -108,6 +115,11 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 	private Status getStatus(Milestone milestone) {
 		return (milestone.getState() == State.OPEN) ? Status.OPEN : Status.CLOSED;
+	}
+
+	private URL getUrl(Repository project, Milestone milestone) throws MalformedURLException {
+		return (project.getVisibility() == Repository.Visibility.PUBLIC)
+				? new URL(project.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber()) : null;
 	}
 
 }

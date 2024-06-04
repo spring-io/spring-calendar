@@ -67,7 +67,7 @@ class GitHubTemplateTests {
 
 	private final Repository repository = new Repository("spring-boot", "spring-projects/spring-boot",
 			"https://api.github.com/repos/spring-projects/spring-boot/milestones",
-			"https://github.com/spring-projects/spring-boot");
+			"https://github.com/spring-projects/spring-boot", Repository.Visibility.PUBLIC);
 
 	@Autowired
 	private GitHubTemplate gitHub;
@@ -95,15 +95,15 @@ class GitHubTemplateTests {
 	}
 
 	@Test
-	void getPublicRepositories() throws MalformedURLException {
-		this.server.expect(requestTo("https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
+	void getRepositories() throws MalformedURLException {
+		this.server.expect(requestTo("https://api.github.com/orgs/spring-projects/repos?per_page=100"))
 			.andRespond(this.testMethodResponse);
-		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects", null);
+		Page<Repository> page = this.gitHub.getRepositories("spring-projects", null);
 		assertThat(page.getContent()).hasSize(30);
 		assertThat(page.getContent().get(0).getMilestonesUrl())
-			.isEqualTo(new URL("https://api.github.com/repos/spring-projects/Spring-Integration-in-Action/milestones"));
+			.isEqualTo(new URL("https://api.github.com/repos/spring-projects/spring-data-commons/milestones"));
 		assertThat(page.getContent().get(0).getHtmlUrl())
-			.isEqualTo(new URL("https://github.com/spring-projects/Spring-Integration-in-Action"));
+			.isEqualTo(new URL("https://github.com/spring-projects/spring-data-commons"));
 		this.server.verify();
 	}
 

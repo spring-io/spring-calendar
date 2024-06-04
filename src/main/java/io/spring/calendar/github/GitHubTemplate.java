@@ -80,9 +80,9 @@ class GitHubTemplate implements GitHubOperations {
 	}
 
 	@Override
-	public Page<Repository> getPublicRepositories(String organization, Page<Repository> earlierResponse) {
+	public Page<Repository> getRepositories(String organization, Page<Repository> earlierResponse) {
 		String url = (earlierResponse != null) ? earlierResponse.getUrl()
-				: "https://api.github.com/orgs/" + organization + "/repos?type=public&per_page=100";
+				: "https://api.github.com/orgs/" + organization + "/repos?per_page=100";
 		return new PageSupplier<>(url, earlierResponse, Repository[].class).get();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,18 @@ class Repository {
 
 	private final URL htmlUrl;
 
+	private final Visibility visibility;
+
 	@JsonCreator
 	Repository(@JsonProperty("name") String name, @JsonProperty("full_name") String fullName,
-			@JsonProperty("milestones_url") String milestonesUrl, @JsonProperty("html_url") String htmlUrl) {
+			@JsonProperty("milestones_url") String milestonesUrl, @JsonProperty("html_url") String htmlUrl,
+			@JsonProperty("visibility") Visibility visibility) {
 		this.name = name;
 		this.fullName = name;
 		this.displayName = capitalize(name.replace('-', ' '));
 		this.milestonesUrl = sanitizeUrl(milestonesUrl);
 		this.htmlUrl = sanitizeUrl(htmlUrl);
+		this.visibility = visibility;
 	}
 
 	String getName() {
@@ -69,6 +73,10 @@ class Repository {
 
 	URL getHtmlUrl() {
 		return this.htmlUrl;
+	}
+
+	Visibility getVisibility() {
+		return this.visibility;
 	}
 
 	private static String capitalize(String input) {
@@ -95,6 +103,25 @@ class Repository {
 		catch (MalformedURLException ex) {
 			throw new IllegalArgumentException(ex);
 		}
+	}
+
+	enum Visibility {
+
+		/**
+		 * A private repository.
+		 */
+		PRIVATE,
+
+		/**
+		 * A public repository.
+		 */
+		PUBLIC,
+
+		/**
+		 * An internal repository.
+		 */
+		INTERNAL;
+
 	}
 
 }

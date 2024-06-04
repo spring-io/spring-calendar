@@ -1,3 +1,7 @@
+spring:
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
 calendar:
   github:
     token: ${calendar-github-token}

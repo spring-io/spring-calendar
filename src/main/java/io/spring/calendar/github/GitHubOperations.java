@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2019 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ interface GitHubOperations {
 	Page<Milestone> getMilestones(Repository repository, Page<Milestone> earlierResponse);
 
 	/**
-	 * Returns the public repositories of the given {@code organization}.
+	 * Returns the repositories of the given {@code organization}.
 	 * @param organization the name of the organization
 	 * @param earlierResponse the first page of an earlier response that can be used to
 	 * perform conditional requests, or {@code null}.
 	 * @return the page of repositories
 	 */
-	Page<Repository> getPublicRepositories(String organization, Page<Repository> earlierResponse);
+	Page<Repository> getRepositories(String organization, Page<Repository> earlierResponse);
 
 }
