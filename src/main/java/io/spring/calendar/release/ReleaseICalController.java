@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class ReleaseICalController {
 	}
 
 	@RequestMapping(produces = "text/calendar")
-	String calendar() throws ParseException {
+	String calendar() {
 		ICalendar calendar = new ICalendar();
 		calendar.setExperimentalProperty("X-WR-CALNAME", "Spring Releases");
 		this.releaseRepository.findAll().stream().map(this::createEvent).forEach(calendar::addEvent);

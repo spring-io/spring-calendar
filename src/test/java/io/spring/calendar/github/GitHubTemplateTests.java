@@ -18,7 +18,6 @@ package io.spring.calendar.github;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +82,7 @@ class GitHubTemplateTests {
 	RestTemplateBuilder restTemplateBuilder;
 
 	@Test
-	void getMilestones() throws MalformedURLException {
+	void getMilestones() {
 		this.server
 			.expect(requestTo(
 					"https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100"))
@@ -96,7 +95,7 @@ class GitHubTemplateTests {
 	}
 
 	@Test
-	void getPublicRepositories() throws URISyntaxException, MalformedURLException {
+	void getPublicRepositories() throws MalformedURLException {
 		this.server.expect(requestTo("https://api.github.com/orgs/spring-projects/repos?type=public&per_page=100"))
 			.andRespond(this.testMethodResponse);
 		Page<Repository> page = this.gitHub.getPublicRepositories("spring-projects", null);
