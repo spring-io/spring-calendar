@@ -40,13 +40,9 @@ class ReleaseUpdater {
 
 	private final ReleaseRepository releaseRepository;
 
-	private final ProjectNameAliaser projectNameAliaser;
-
-	ReleaseUpdater(List<ReleaseScheduleSource> releaseScheduleSources, ReleaseRepository releaseRepository,
-			ProjectNameAliaser projectNameAliaser) {
+	ReleaseUpdater(List<ReleaseScheduleSource> releaseScheduleSources, ReleaseRepository releaseRepository) {
 		this.releaseScheduleSources = releaseScheduleSources;
 		this.releaseRepository = releaseRepository;
-		this.projectNameAliaser = projectNameAliaser;
 	}
 
 	@Scheduled(fixedRate = 5 * 60 * 1000)
@@ -55,7 +51,6 @@ class ReleaseUpdater {
 		List<Release> releases = getReleaseSchedulesByProject().values()
 			.stream()
 			.flatMap((releaseSchedule) -> releaseSchedule.getReleases().stream())
-			.map(this::applyNameAlias)
 			.toList();
 		updateReleases(releases);
 		log.info("Releases updated");
@@ -75,10 +70,6 @@ class ReleaseUpdater {
 		if (existing != null) {
 			existing.getReleases().addAll(schedule.getReleases());
 		}
-	}
-
-	private Release applyNameAlias(Release release) {
-		return release.withProject(this.projectNameAliaser.apply(release.getProject()));
 	}
 
 	private void updateReleases(List<Release> releases) {

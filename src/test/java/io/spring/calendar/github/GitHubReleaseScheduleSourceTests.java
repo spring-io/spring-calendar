@@ -17,8 +17,10 @@
 package io.spring.calendar.github;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 
+import io.spring.calendar.github.GitHubProperties.Organization;
 import io.spring.calendar.github.Milestone.State;
 import io.spring.calendar.github.Repository.Visibility;
 import io.spring.calendar.release.ReleaseSchedule;
@@ -39,7 +41,8 @@ class GitHubReleaseScheduleSourceTests {
 	private final GitHubOperations gitHub = mock(GitHubOperations.class);
 
 	private final GitHubReleaseScheduleSource source = new GitHubReleaseScheduleSource(this.gitHub,
-			List.of("spring-projects", "spring-cloud"));
+			List.of(new Organization("spring-projects", Collections.emptyList()),
+					new Organization("spring-cloud", Collections.emptyList())));
 
 	@Test
 	void whenThereAreNoRepositoriesThenReleaseSchedulesIsEmpty() {

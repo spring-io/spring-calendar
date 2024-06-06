@@ -27,12 +27,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import io.spring.calendar.github.GitHubProperties.Organization;
+import io.spring.calendar.github.GitHubProperties.Transform;
 import io.spring.calendar.github.Milestone.State;
 import io.spring.calendar.github.Repository.Visibility;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
 import io.spring.calendar.release.ReleaseSchedule;
 import io.spring.calendar.release.ReleaseScheduleSource;
+
+import org.springframework.util.Assert;
 
 /**
  * A {@link ReleaseScheduleSource} for projects managed on GitHub.
@@ -41,17 +45,15 @@ import io.spring.calendar.release.ReleaseScheduleSource;
  */
 class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
-	private static final String COMMERCIAL_REPOSITORY_NAME_SUFFIX = "-commercial";
-
 	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<>();
 
 	private final Map<String, Page<Repository>> earlierRepositories = new HashMap<>();
 
-	private final List<String> organizations;
+	private final List<Organization> organizations;
 
 	private final GitHubOperations gitHub;
 
-	GitHubReleaseScheduleSource(GitHubOperations gitHub, List<String> organizations) {
+	GitHubReleaseScheduleSource(GitHubOperations gitHub, List<Organization> organizations) {
 		this.gitHub = gitHub;
 		this.organizations = organizations;
 	}
@@ -60,56 +62,45 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	public List<ReleaseSchedule> get() {
 		return this.organizations.stream()
 			.flatMap(this::getRepositories)
-			.filter(this::include)
+			.filter(Project::include)
 			.map(this::createReleaseSchedule)
 			.toList();
 	}
 
-	private Stream<Repository> getRepositories(String organization) {
-		Page<Repository> page = this.gitHub.getRepositories(organization, this.earlierRepositories.get(organization));
-		this.earlierRepositories.put(organization, this.earlierRepositories.get(organization));
-		return collectContent(page).stream();
-	}
-
-	private boolean include(Repository repository) {
-		return (repository.getVisibility() == Visibility.PUBLIC) || repository.getName().endsWith("-commercial");
-	}
-
-	private ReleaseSchedule createReleaseSchedule(Repository repository) {
-		Page<Milestone> page = this.gitHub.getMilestones(repository,
-				this.earlierMilestones.get(repository.getFullName()));
-		this.earlierMilestones.put(repository.getFullName(), page);
-		String projectName = getProjectName(repository);
-		List<Release> releases = getReleases(projectName, repository, page);
-		return new ReleaseSchedule(projectName, releases);
-	}
-
-	private String getProjectName(Repository repository) {
-		String name = repository.getName();
-		if (name.endsWith(GitHubReleaseScheduleSource.COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
-			name = name.substring(0,
-					name.length() - GitHubReleaseScheduleSource.COMMERCIAL_REPOSITORY_NAME_SUFFIX.length());
+	private Stream<Project> getRepositories(Organization organization) {
+		String organizationName = organization.getName();
+		Map<String, Transform> transforms = new HashMap<>();
+		for (Transform transform : organization.getTransforms()) {
+			Transform existing = transforms.put(transform.getRepository(), transform);
+			Assert.isNull(existing, () -> "Found duplicate transform for %s/%s".formatted(organization.getName(),
+					transform.getRepository()));
 		}
-		return capitalize(name.replace('-', ' '));
+		Page<Repository> page = this.gitHub.getRepositories(organizationName,
+				this.earlierRepositories.get(organizationName));
+		this.earlierRepositories.put(organizationName, this.earlierRepositories.get(organizationName));
+		return collectContent(page).stream()
+			.map((repository) -> asProject(repository, transforms.get(repository.getName())));
 	}
 
-	private static String capitalize(String input) {
-		StringWriter output = new StringWriter();
-		for (int i = 0; i < input.length(); i++) {
-			if (i == 0 || i > 0 && input.charAt(i - 1) == ' ') {
-				output.append(Character.toUpperCase(input.charAt(i)));
-			}
-			else {
-				output.append(input.charAt(i));
-			}
+	private Project asProject(Repository repository, Transform transform) {
+		if (transform == null) {
+			return new Project(repository);
 		}
-		return output.toString();
+		return new Project(repository, transform);
 	}
 
-	private List<Release> getReleases(String projectName, Repository repository, Page<Milestone> page) {
+	private ReleaseSchedule createReleaseSchedule(Project project) {
+		Page<Milestone> page = this.gitHub.getMilestones(project.getRepository(),
+				this.earlierMilestones.get(project.getRepository().getFullName()));
+		this.earlierMilestones.put(project.getRepository().getFullName(), page);
+		List<Release> releases = getReleases(project, page);
+		return new ReleaseSchedule(project.getName(), releases);
+	}
+
+	private List<Release> getReleases(Project project, Page<Milestone> page) {
 		return collectContent(page).stream()
 			.filter(this::hasReleaseDate)
-			.map((Milestone milestone) -> createRelease(projectName, repository, milestone))
+			.map((Milestone milestone) -> createRelease(project, milestone))
 			.toList();
 	}
 
@@ -126,33 +117,95 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 		return milestone.getDueOn() != null;
 	}
 
-	private Release createRelease(String projectName, Repository repository, Milestone milestone) {
-		return new Release(projectName, milestone.getTitle(),
+	private Release createRelease(Project project, Milestone milestone) {
+		return new Release(project.getName(), milestone.getTitle(),
 				milestone.getDueOn()
 					.withZoneSameInstant(ZoneId.of("Europe/London"))
 					.format(DateTimeFormatter.ISO_LOCAL_DATE),
-				getStatus(milestone), getUrl(repository, milestone),
-				repository.getName().endsWith(GitHubReleaseScheduleSource.COMMERCIAL_REPOSITORY_NAME_SUFFIX));
+				getStatus(milestone), project.urlFor(milestone), project.isCommercial());
 	}
 
 	private Status getStatus(Milestone milestone) {
 		return (milestone.getState() == State.OPEN) ? Status.OPEN : Status.CLOSED;
 	}
 
-	private URL getUrl(Repository repository, Milestone milestone) {
-		try {
-			if (repository.getName().endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
-				String url = "https://enterprise.spring.io/projects/" + repository.getName();
-				if (milestone.getState() == State.CLOSED) {
-					url = url + "/changelog/" + milestone.getTitle();
-				}
-				return new URL(url);
+	private static class Project {
+
+		private static final String COMMERCIAL_REPOSITORY_NAME_SUFFIX = "-commercial";
+
+		private final Repository repository;
+
+		private final String name;
+
+		private final String commercialProjectId;
+
+		Project(Repository repository) {
+			this(repository, getName(repository), repository.getName());
+		}
+
+		Project(Repository repository, Transform transform) {
+			this(repository, transform.getDisplayName(), transform.getCommercialProjectId());
+		}
+
+		Project(Repository repository, String name, String commercialProjectId) {
+			this.repository = repository;
+			this.name = name;
+			this.commercialProjectId = commercialProjectId;
+		}
+
+		private Repository getRepository() {
+			return this.repository;
+		}
+
+		private boolean include() {
+			return (this.repository.getVisibility() == Visibility.PUBLIC) || this.isCommercial();
+		}
+
+		private String getName() {
+			return this.name;
+		}
+
+		private static String getName(Repository repository) {
+			String name = repository.getName();
+			if (name.endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+				name = name.substring(0, name.length() - COMMERCIAL_REPOSITORY_NAME_SUFFIX.length());
 			}
-			return new URL(repository.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber());
+			return capitalize(name.replace('-', ' '));
 		}
-		catch (MalformedURLException ex) {
-			throw new RuntimeException(ex);
+
+		private static String capitalize(String input) {
+			StringWriter output = new StringWriter();
+			for (int i = 0; i < input.length(); i++) {
+				if (i == 0 || i > 0 && input.charAt(i - 1) == ' ') {
+					output.append(Character.toUpperCase(input.charAt(i)));
+				}
+				else {
+					output.append(input.charAt(i));
+				}
+			}
+			return output.toString();
 		}
+
+		private boolean isCommercial() {
+			return this.repository.getName().endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX);
+		}
+
+		private URL urlFor(Milestone milestone) {
+			try {
+				if (this.repository.getName().endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+					String url = "https://enterprise.spring.io/projects/" + this.commercialProjectId;
+					if (milestone.getState() == State.CLOSED) {
+						url = url + "/changelog/" + milestone.getTitle();
+					}
+					return new URL(url);
+				}
+				return new URL(this.repository.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber());
+			}
+			catch (MalformedURLException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+
 	}
 
 }

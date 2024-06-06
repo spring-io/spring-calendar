@@ -6,13 +6,16 @@ calendar:
   github:
     token: ${calendar-github-token}
     organizations:
-      - micrometer-metrics
-      - r2dbc
-      - reactor
-      - spring-cloud
-      - spring-gradle-plugins
-      - spring-io
-      - spring-projects
-  release:
-    project_aliases:
-      'Toolsuite Distribution': STS
+      - name: micrometer-metrics
+        transforms:
+          - repository: tracing
+            display-name: Micrometer Tracing
+          - repository: tracing-commercial
+            display-name: Micrometer Tracing
+            commercial-project-id: micrometer-tracing
+      - name: r2dbc
+      - name: reactor
+      - name: spring-cloud
+      - name: spring-gradle-plugins
+      - name: spring-io
+      - name: spring-projects
