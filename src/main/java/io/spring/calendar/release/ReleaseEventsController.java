@@ -55,7 +55,7 @@ class ReleaseEventsController {
 		Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(end);
 		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream().map((release) -> {
 			Map<String, Object> event = new HashMap<>();
-			event.put("title", release.getProject() + " " + release.getName());
+			event.put("title", release.getDescription());
 			event.put("allDay", true);
 			event.put("start", release.getDate());
 			if (release.getUrl() != null) {

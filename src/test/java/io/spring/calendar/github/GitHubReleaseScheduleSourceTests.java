@@ -98,7 +98,7 @@ class GitHubReleaseScheduleSourceTests {
 			.willReturn(page(new Milestone("2.7.21", ZonedDateTime.now(), State.OPEN, 1)));
 		List<ReleaseSchedule> releaseSchedules = this.source.get();
 		assertThat(releaseSchedules).singleElement().satisfies((schedule) -> {
-			assertThat(schedule.getProject()).isEqualTo("Spring Boot Commercial");
+			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
 			assertThat(schedule.getReleases()).hasSize(1);
 		});
 	}
@@ -112,7 +112,7 @@ class GitHubReleaseScheduleSourceTests {
 			.willReturn(page(new Milestone("2.7.21", ZonedDateTime.now(), State.OPEN, 1)));
 		List<ReleaseSchedule> releaseSchedules = this.source.get();
 		assertThat(releaseSchedules).singleElement().satisfies((schedule) -> {
-			assertThat(schedule.getProject()).isEqualTo("Spring Boot Commercial");
+			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
 			assertThat(schedule.getReleases()).hasSize(1);
 		});
 	}

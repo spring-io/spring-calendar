@@ -52,7 +52,7 @@ class ReleaseICalController {
 
 	private VEvent createEvent(Release release) {
 		VEvent event = new VEvent();
-		event.setSummary(release.getProject() + " " + release.getName());
+		event.setSummary(release.getDescription());
 		try {
 			Date date = new SimpleDateFormat("yyyy-MM-dd").parse(release.getDate());
 			event.setDateStart(date, false);

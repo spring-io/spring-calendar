@@ -102,7 +102,7 @@ class GitHubTemplateTests {
 		assertThat(page.getContent()).hasSize(30);
 		assertThat(page.getContent().get(0).getMilestonesUrl())
 			.isEqualTo(new URL("https://api.github.com/repos/spring-projects/spring-data-commons/milestones"));
-		assertThat(page.getContent().get(0).getHtmlUrl())
+		assertThat(page.getContent().get(0)).extracting("htmlUrl")
 			.isEqualTo(new URL("https://github.com/spring-projects/spring-data-commons"));
 		this.server.verify();
 	}

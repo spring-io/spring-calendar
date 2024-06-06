@@ -97,7 +97,8 @@ class ICalReleaseScheduleSource implements ReleaseScheduleSource {
 			name = name.substring(project.getName().length()).trim();
 		}
 		return new Release(project.getName(), name,
-				new SimpleDateFormat("yyyy-MM-dd").format(event.getDateStart().getValue()), Status.UNKNOWN, null);
+				new SimpleDateFormat("yyyy-MM-dd").format(event.getDateStart().getValue()), Status.UNKNOWN, null,
+				false);
 	}
 
 	private static List<ICalProject> createProjects() {

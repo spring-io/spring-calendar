@@ -58,6 +58,8 @@ public class Release {
 
 	private final URL url;
 
+	private final boolean commercial;
+
 	/**
 	 * Creates a new {@code Release}.
 	 * @param project the project
@@ -65,21 +67,19 @@ public class Release {
 	 * @param date the date of the release (yyyy-mm-dd)
 	 * @param status the status of the release
 	 * @param url the URL of the release
+	 * @param commercial whether this is a commercial release
 	 */
-	public Release(String project, String name, String date, Status status, URL url) {
+	public Release(String project, String name, String date, Status status, URL url, boolean commercial) {
 		this.project = project;
 		this.name = name;
 		this.date = date;
 		this.status = status;
 		this.url = url;
+		this.commercial = commercial;
 	}
 
 	String getProject() {
 		return this.project;
-	}
-
-	String getName() {
-		return this.name;
 	}
 
 	String getDate() {
@@ -97,6 +97,18 @@ public class Release {
 
 	URL getUrl() {
 		return this.url;
+	}
+
+	String getDescription() {
+		String description = this.project + " " + this.name;
+		if (this.commercial) {
+			description = description + " (Commercial)";
+		}
+		return description;
+	}
+
+	Release withProject(String project) {
+		return new Release(project, this.name, this.date, this.status, this.url, this.commercial);
 	}
 
 }

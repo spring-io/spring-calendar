@@ -16,6 +16,7 @@
 
 package io.spring.calendar.github;
 
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.ZoneId;
@@ -39,6 +40,8 @@ import io.spring.calendar.release.ReleaseScheduleSource;
  * @author Andy Wilkinson
  */
 class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
+
+	private static final String COMMERCIAL_REPOSITORY_NAME_SUFFIX = "-commercial";
 
 	private final Map<String, Page<Milestone>> earlierMilestones = new HashMap<>();
 
@@ -76,14 +79,37 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 		Page<Milestone> page = this.gitHub.getMilestones(repository,
 				this.earlierMilestones.get(repository.getFullName()));
 		this.earlierMilestones.put(repository.getFullName(), page);
-		List<Release> releases = getReleases(repository, page);
-		return new ReleaseSchedule(repository.getDisplayName(), releases);
+		String projectName = getProjectName(repository);
+		List<Release> releases = getReleases(projectName, repository, page);
+		return new ReleaseSchedule(projectName, releases);
 	}
 
-	private List<Release> getReleases(Repository repository, Page<Milestone> page) {
+	private String getProjectName(Repository repository) {
+		String name = repository.getName();
+		if (name.endsWith(GitHubReleaseScheduleSource.COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+			name = name.substring(0,
+					name.length() - GitHubReleaseScheduleSource.COMMERCIAL_REPOSITORY_NAME_SUFFIX.length());
+		}
+		return capitalize(name.replace('-', ' '));
+	}
+
+	private static String capitalize(String input) {
+		StringWriter output = new StringWriter();
+		for (int i = 0; i < input.length(); i++) {
+			if (i == 0 || i > 0 && input.charAt(i - 1) == ' ') {
+				output.append(Character.toUpperCase(input.charAt(i)));
+			}
+			else {
+				output.append(input.charAt(i));
+			}
+		}
+		return output.toString();
+	}
+
+	private List<Release> getReleases(String projectName, Repository repository, Page<Milestone> page) {
 		return collectContent(page).stream()
 			.filter(this::hasReleaseDate)
-			.map((Milestone milestone) -> createRelease(repository, milestone))
+			.map((Milestone milestone) -> createRelease(projectName, repository, milestone))
 			.toList();
 	}
 
@@ -100,26 +126,33 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 		return milestone.getDueOn() != null;
 	}
 
-	private Release createRelease(Repository project, Milestone milestone) {
-		try {
-			return new Release(project.getDisplayName(), milestone.getTitle(),
-					milestone.getDueOn()
-						.withZoneSameInstant(ZoneId.of("Europe/London"))
-						.format(DateTimeFormatter.ISO_LOCAL_DATE),
-					getStatus(milestone), getUrl(project, milestone));
-		}
-		catch (MalformedURLException ex) {
-			throw new RuntimeException(ex);
-		}
+	private Release createRelease(String projectName, Repository repository, Milestone milestone) {
+		return new Release(projectName, milestone.getTitle(),
+				milestone.getDueOn()
+					.withZoneSameInstant(ZoneId.of("Europe/London"))
+					.format(DateTimeFormatter.ISO_LOCAL_DATE),
+				getStatus(milestone), getUrl(repository, milestone),
+				repository.getName().endsWith(GitHubReleaseScheduleSource.COMMERCIAL_REPOSITORY_NAME_SUFFIX));
 	}
 
 	private Status getStatus(Milestone milestone) {
 		return (milestone.getState() == State.OPEN) ? Status.OPEN : Status.CLOSED;
 	}
 
-	private URL getUrl(Repository project, Milestone milestone) throws MalformedURLException {
-		return (project.getVisibility() == Repository.Visibility.PUBLIC)
-				? new URL(project.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber()) : null;
+	private URL getUrl(Repository repository, Milestone milestone) {
+		try {
+			if (repository.getName().endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+				String url = "https://enterprise.spring.io/projects/" + repository.getName();
+				if (milestone.getState() == State.CLOSED) {
+					url = url + "/changelog/" + milestone.getTitle();
+				}
+				return new URL(url);
+			}
+			return new URL(repository.getHtmlUrl().toString() + "/milestone/" + milestone.getNumber());
+		}
+		catch (MalformedURLException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 }

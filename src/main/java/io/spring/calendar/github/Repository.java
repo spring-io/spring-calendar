@@ -16,7 +16,6 @@
 
 package io.spring.calendar.github;
 
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -35,8 +34,6 @@ class Repository {
 
 	private final String fullName;
 
-	private final String displayName;
-
 	private final URL milestonesUrl;
 
 	private final URL htmlUrl;
@@ -48,23 +45,18 @@ class Repository {
 			@JsonProperty("milestones_url") String milestonesUrl, @JsonProperty("html_url") String htmlUrl,
 			@JsonProperty("visibility") Visibility visibility) {
 		this.name = name;
-		this.fullName = name;
-		this.displayName = capitalize(name.replace('-', ' '));
+		this.fullName = fullName;
 		this.milestonesUrl = sanitizeUrl(milestonesUrl);
 		this.htmlUrl = sanitizeUrl(htmlUrl);
 		this.visibility = visibility;
-	}
-
-	String getName() {
-		return this.name;
 	}
 
 	String getFullName() {
 		return this.fullName;
 	}
 
-	String getDisplayName() {
-		return this.displayName;
+	String getName() {
+		return this.name;
 	}
 
 	URL getMilestonesUrl() {
@@ -77,19 +69,6 @@ class Repository {
 
 	Visibility getVisibility() {
 		return this.visibility;
-	}
-
-	private static String capitalize(String input) {
-		StringWriter output = new StringWriter();
-		for (int i = 0; i < input.length(); i++) {
-			if (i == 0 || i > 0 && input.charAt(i - 1) == ' ') {
-				output.append(Character.toUpperCase(input.charAt(i)));
-			}
-			else {
-				output.append(input.charAt(i));
-			}
-		}
-		return output.toString();
 	}
 
 	private static URL sanitizeUrl(String url) {
