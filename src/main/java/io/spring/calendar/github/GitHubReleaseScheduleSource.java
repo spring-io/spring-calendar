@@ -83,10 +83,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private Project asProject(Repository repository, Transform transform) {
-		if (transform == null) {
-			return new Project(repository);
-		}
-		return new Project(repository, transform);
+		return (transform != null) ? Project.from(repository, transform) : Project.from(repository);
 	}
 
 	private ReleaseSchedule createReleaseSchedule(Project project) {
@@ -129,7 +126,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 		return (milestone.getState() == State.OPEN) ? Status.OPEN : Status.CLOSED;
 	}
 
-	private static class Project {
+	private static final class Project {
 
 		private static final String COMMERCIAL_REPOSITORY_NAME_SUFFIX = "-commercial";
 
@@ -139,15 +136,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 		private final String commercialProjectId;
 
-		Project(Repository repository) {
-			this(repository, getName(repository), repository.getName());
-		}
-
-		Project(Repository repository, Transform transform) {
-			this(repository, transform.getDisplayName(), transform.getCommercialProjectId());
-		}
-
-		Project(Repository repository, String name, String commercialProjectId) {
+		private Project(Repository repository, String name, String commercialProjectId) {
 			this.repository = repository;
 			this.name = name;
 			this.commercialProjectId = commercialProjectId;
@@ -163,14 +152,6 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 		private String getName() {
 			return this.name;
-		}
-
-		private static String getName(Repository repository) {
-			String name = repository.getName();
-			if (name.endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
-				name = name.substring(0, name.length() - COMMERCIAL_REPOSITORY_NAME_SUFFIX.length());
-			}
-			return capitalize(name.replace('-', ' '));
 		}
 
 		private static String capitalize(String input) {
@@ -204,6 +185,51 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 			catch (MalformedURLException ex) {
 				throw new RuntimeException(ex);
 			}
+		}
+
+		static Project from(Repository repository) {
+			return from(repository, null);
+		}
+
+		static Project from(Repository repository, Transform transform) {
+			return new Project(repository, getName(repository, transform),
+					getCommercialProjectId(repository, transform));
+		}
+
+		private static String getName(Repository repository, Transform transform) {
+			if (transform != null) {
+				String name = transform.getDisplayName();
+				if (name != null) {
+					return name;
+				}
+			}
+			return getName(repository);
+		}
+
+		private static String getName(Repository repository) {
+			String name = repository.getName();
+			if (name.endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+				name = name.substring(0, name.length() - COMMERCIAL_REPOSITORY_NAME_SUFFIX.length());
+			}
+			return capitalize(name.replace('-', ' '));
+		}
+
+		private static String getCommercialProjectId(Repository repository, Transform transform) {
+			if (transform != null) {
+				String id = transform.getCommercialProjectId();
+				if (id != null) {
+					return id;
+				}
+			}
+			return getCommercialProjectId(repository);
+		}
+
+		private static String getCommercialProjectId(Repository repository) {
+			String id = repository.getName();
+			if (id.endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+				return id.substring(0, id.length() - COMMERCIAL_REPOSITORY_NAME_SUFFIX.length());
+			}
+			return null;
 		}
 
 	}
