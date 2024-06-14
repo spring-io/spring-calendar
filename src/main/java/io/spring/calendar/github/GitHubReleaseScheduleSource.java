@@ -33,6 +33,7 @@ import io.spring.calendar.github.Milestone.State;
 import io.spring.calendar.github.Repository.Visibility;
 import io.spring.calendar.release.Release;
 import io.spring.calendar.release.Release.Status;
+import io.spring.calendar.release.Release.Type;
 import io.spring.calendar.release.ReleaseSchedule;
 import io.spring.calendar.release.ReleaseScheduleSource;
 
@@ -119,11 +120,15 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 				milestone.getDueOn()
 					.withZoneSameInstant(ZoneId.of("Europe/London"))
 					.format(DateTimeFormatter.ISO_LOCAL_DATE),
-				getStatus(milestone), project.urlFor(milestone), project.isCommercial());
+				getStatus(milestone), project.urlFor(milestone), getType(project));
 	}
 
 	private Status getStatus(Milestone milestone) {
 		return (milestone.getState() == State.OPEN) ? Status.OPEN : Status.CLOSED;
+	}
+
+	private Type getType(Project project) {
+		return project.isCommercial() ? Type.COMMERCIAL : Type.OSS;
 	}
 
 	private static final class Project {

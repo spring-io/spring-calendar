@@ -26,6 +26,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 
+import io.spring.calendar.release.Release.Type;
+
 import org.springframework.stereotype.Repository;
 
 /**
@@ -53,10 +55,10 @@ class InMemoryReleaseRepository implements ReleaseRepository {
 	}
 
 	@Override
-	public List<Release> findAll() {
+	public List<Release> findAllOfType(Type type) {
 		this.lock.readLock().lock();
 		try {
-			return new ArrayList<>(this.releases);
+			return this.releases.stream().filter(matches(type)).toList();
 		}
 		finally {
 			this.lock.readLock().unlock();
@@ -64,10 +66,10 @@ class InMemoryReleaseRepository implements ReleaseRepository {
 	}
 
 	@Override
-	public List<Release> findAllInPeriod(Date start, Date end) {
+	public List<Release> findAllOfTypeInPeriod(Type type, Date start, Date end) {
 		this.lock.readLock().lock();
 		try {
-			return this.releases.stream().filter(isWithinPeriod(start, end)).toList();
+			return this.releases.stream().filter(isWithinPeriod(start, end)).filter(matches(type)).toList();
 		}
 		finally {
 			this.lock.readLock().unlock();
@@ -84,6 +86,10 @@ class InMemoryReleaseRepository implements ReleaseRepository {
 				return true;
 			}
 		};
+	}
+
+	private Predicate<Release> matches(Type type) {
+		return (release) -> (type != null) ? release.getType() == type : true;
 	}
 
 }

@@ -27,27 +27,6 @@ import java.time.ZoneId;
  */
 public class Release {
 
-	/**
-	 * Status of the release, if known.
-	 *
-	 */
-	public enum Status {
-
-		/**
-		 * The release is open (not yet closed).
-		 */
-		OPEN,
-		/**
-		 * The release is closed (completed).
-		 */
-		CLOSED,
-		/**
-		 * The release status is not known.
-		 */
-		UNKNOWN
-
-	}
-
 	private final String project;
 
 	private final String name;
@@ -58,7 +37,7 @@ public class Release {
 
 	private final URL url;
 
-	private final boolean commercial;
+	private final Type type;
 
 	/**
 	 * Creates a new {@code Release}.
@@ -67,15 +46,15 @@ public class Release {
 	 * @param date the date of the release (yyyy-mm-dd)
 	 * @param status the status of the release
 	 * @param url the URL of the release
-	 * @param commercial whether this is a commercial release
+	 * @param type the type of the release
 	 */
-	public Release(String project, String name, String date, Status status, URL url, boolean commercial) {
+	public Release(String project, String name, String date, Status status, URL url, Type type) {
 		this.project = project;
 		this.name = name;
 		this.date = date;
 		this.status = status;
 		this.url = url;
-		this.commercial = commercial;
+		this.type = type;
 	}
 
 	String getProject() {
@@ -99,16 +78,58 @@ public class Release {
 		return this.url;
 	}
 
+	Type getType() {
+		return this.type;
+	}
+
 	String getDescription() {
 		String description = this.project + " " + this.name;
-		if (this.commercial) {
+		if (this.type == Type.COMMERCIAL) {
 			description = description + " (Commercial)";
 		}
 		return description;
 	}
 
 	Release withProject(String project) {
-		return new Release(project, this.name, this.date, this.status, this.url, this.commercial);
+		return new Release(project, this.name, this.date, this.status, this.url, this.type);
+	}
+
+	/**
+	 * Type of the release.
+	 */
+	public enum Type {
+
+		/**
+		 * An OSS release.
+		 */
+		OSS,
+
+		/**
+		 * A commercial release.
+		 */
+		COMMERCIAL;
+
+	}
+
+	/**
+	 * Status of the release, if known.
+	 *
+	 */
+	public enum Status {
+
+		/**
+		 * The release is open (not yet closed).
+		 */
+		OPEN,
+		/**
+		 * The release is closed (completed).
+		 */
+		CLOSED,
+		/**
+		 * The release status is not known.
+		 */
+		UNKNOWN
+
 	}
 
 }

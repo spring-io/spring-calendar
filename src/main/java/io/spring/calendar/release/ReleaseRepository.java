@@ -19,6 +19,8 @@ package io.spring.calendar.release;
 import java.util.Date;
 import java.util.List;
 
+import io.spring.calendar.release.Release.Type;
+
 /**
  * A repository for {@link Release Releases}.
  *
@@ -33,18 +35,21 @@ public interface ReleaseRepository {
 	void set(List<Release> releases);
 
 	/**
-	 * Returns all of the releases known to the repository.
+	 * Returns all of the releases known to the repository of the given {@code type}.
+	 * @param type the release type. May be {@code null} to return all known releases.
 	 * @return the releases
 	 */
-	List<Release> findAll();
+	List<Release> findAllOfType(Type type);
 
 	/**
 	 * Returns all of the releases known to the repository with a release date in the
 	 * given period.
+	 * @param type the release type. May be {@code null} to return all known releases in
+	 * the given period.
 	 * @param start the start of the period
 	 * @param end the end of the period
 	 * @return the releases in the period
 	 */
-	List<Release> findAllInPeriod(Date start, Date end);
+	List<Release> findAllOfTypeInPeriod(Type type, Date start, Date end);
 
 }

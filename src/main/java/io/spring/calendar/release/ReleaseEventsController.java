@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.spring.calendar.release.Release.Status;
+import io.spring.calendar.release.Release.Type;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,10 +51,11 @@ class ReleaseEventsController {
 	}
 
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	List<Map<String, Object>> releases(@RequestParam String start, @RequestParam String end) throws ParseException {
+	List<Map<String, Object>> releases(@RequestParam String start, @RequestParam String end,
+			@RequestParam(required = false) Type type) throws ParseException {
 		Date startDate = new SimpleDateFormat("yyyy-MM-dd").parse(start);
 		Date endDate = new SimpleDateFormat("yyyy-MM-dd").parse(end);
-		return this.releaseRepository.findAllInPeriod(startDate, endDate).stream().map((release) -> {
+		return this.releaseRepository.findAllOfTypeInPeriod(type, startDate, endDate).stream().map((release) -> {
 			Map<String, Object> event = new HashMap<>();
 			event.put("title", release.getDescription());
 			event.put("allDay", true);

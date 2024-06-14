@@ -23,8 +23,10 @@ import java.util.Date;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
+import io.spring.calendar.release.Release.Type;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -43,11 +45,21 @@ class ReleaseICalController {
 	}
 
 	@RequestMapping(produces = "text/calendar")
-	String calendar() {
+	String calendar(@RequestParam(required = false) Type type) {
 		ICalendar calendar = new ICalendar();
-		calendar.setExperimentalProperty("X-WR-CALNAME", "Spring Releases");
-		this.releaseRepository.findAll().stream().map(this::createEvent).forEach(calendar::addEvent);
+		calendar.setExperimentalProperty("X-WR-CALNAME", nameForType(type));
+		this.releaseRepository.findAllOfType(type).stream().map(this::createEvent).forEach(calendar::addEvent);
 		return Biweekly.write(calendar).go();
+	}
+
+	private String nameForType(Type type) {
+		if (type == Type.COMMERCIAL) {
+			return "Spring Commercial Releases";
+		}
+		else if (type == Type.OSS) {
+			return "Spring OSS Releases";
+		}
+		return "Spring Releases";
 	}
 
 	private VEvent createEvent(Release release) {
