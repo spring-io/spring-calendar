@@ -25,6 +25,7 @@ import biweekly.ICalendar;
 import biweekly.component.VEvent;
 import io.spring.calendar.release.Release.Type;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/ical")
+@CrossOrigin(origins = { "https://spring.io", "https://enterprise.spring.io" })
 class ReleaseICalController {
 
 	private final ReleaseRepository releaseRepository;

@@ -22,10 +22,13 @@ import java.util.Arrays;
 import io.spring.calendar.release.Release.Status;
 import io.spring.calendar.release.Release.Type;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -80,6 +83,22 @@ class ReleaseEventsControllerTests {
 		this.mvc.perform(MockMvcRequestBuilders.get("/releases?type=oss&start=2024-06-01&end=2024-06-02"))
 			.andExpect(MockMvcResultMatchers.content()
 				.json("[{\"allDay\":true,\"backgroundColor\":\"#6db33f\",\"start\":\"2024-06-01\",\"title\":\"Spring Boot 3.3.1\"}]"));
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "https://spring.io", "https://enterprise.spring.io" })
+	void releasesAllowsCrossOriginRequestsFromSpringIo(String origin) throws Exception {
+		this.mvc
+			.perform(MockMvcRequestBuilders.get("/releases?start=2024-06-01&end=2024-06-02").header("Origin", origin))
+			.andExpect(MockMvcResultMatchers.header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin));
+	}
+
+	@Test
+	void releasesDoesNotAllowCrossOriginRequestsFromElsewhere() throws Exception {
+		this.mvc
+			.perform(MockMvcRequestBuilders.get("/releases?start=2024-06-01&end=2024-06-02")
+				.header("Origin", "https://example.com"))
+			.andExpect(MockMvcResultMatchers.header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
 	}
 
 }

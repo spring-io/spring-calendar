@@ -24,12 +24,16 @@ import biweekly.ICalendar;
 import io.spring.calendar.release.Release.Status;
 import io.spring.calendar.release.Release.Type;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -96,6 +100,19 @@ class ReleaseICalControllerTests {
 			assertThat(calendar.getExperimentalProperty("X-WR-CALNAME").getValue()).isEqualTo("Spring OSS Releases");
 			assertThat(calendar.getEvents()).hasSize(1);
 		});
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "https://spring.io", "https://enterprise.spring.io" })
+	void icalAllowsCrossOriginRequestsFromSpringIo(String origin) throws Exception {
+		this.mvc.perform(MockMvcRequestBuilders.get("/ical").header("Origin", origin))
+			.andExpect(MockMvcResultMatchers.header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin));
+	}
+
+	@Test
+	void icalDoesNotAllowCrossOriginRequestsFromElsewhere() throws Exception {
+		this.mvc.perform(MockMvcRequestBuilders.get("/ical").header("Origin", "https://example.com"))
+			.andExpect(MockMvcResultMatchers.header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
 	}
 
 	private List<ICalendar> calendars(String url) throws Exception {
