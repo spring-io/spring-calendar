@@ -55,8 +55,8 @@ class ReleaseICalController {
 	}
 
 	private String nameForType(Type type) {
-		if (type == Type.COMMERCIAL) {
-			return "Spring Commercial Releases";
+		if (type == Type.ENTERPRISE) {
+			return "Spring Enterprise Releases";
 		}
 		else if (type == Type.OSS) {
 			return "Spring OSS Releases";

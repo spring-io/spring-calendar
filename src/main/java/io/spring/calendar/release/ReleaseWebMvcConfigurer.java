@@ -16,6 +16,10 @@
 
 package io.spring.calendar.release;
 
+import java.util.Locale;
+
+import io.spring.calendar.release.Release.Type;
+
 import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.stereotype.Component;
@@ -32,6 +36,12 @@ class ReleaseWebMvcConfigurer implements WebMvcConfigurer {
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		ApplicationConversionService.addApplicationConverters(registry);
+		registry.addConverter(String.class, Type.class, (input) -> {
+			if ("commercial".equalsIgnoreCase(input)) {
+				return Type.ENTERPRISE;
+			}
+			return Type.valueOf(input.toUpperCase(Locale.ROOT));
+		});
 	}
 
 }

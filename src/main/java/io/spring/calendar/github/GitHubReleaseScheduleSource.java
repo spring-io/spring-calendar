@@ -128,7 +128,7 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private Type getType(Project project) {
-		return project.isCommercial() ? Type.COMMERCIAL : Type.OSS;
+		return project.isCommercial() ? Type.ENTERPRISE : Type.OSS;
 	}
 
 	private static final class Project {

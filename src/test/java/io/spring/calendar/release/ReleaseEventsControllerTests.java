@@ -68,18 +68,36 @@ class ReleaseEventsControllerTests {
 	}
 
 	@Test
-	void whenReleasesWithTypeIsCalledThenReleasesOfTypeInPeriodAreReturned() throws Exception {
+	void whenReleasesWithCommercialTypeIsCalledThenEnterpriseReleasesInPeriodAreReturned() throws Exception {
 		String start = "2024-06-01";
 		String end = "2024-06-02";
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		given(this.releases.findAllOfTypeInPeriod(Type.COMMERCIAL, format.parse(start), format.parse(end)))
+		given(this.releases.findAllOfTypeInPeriod(Type.ENTERPRISE, format.parse(start), format.parse(end)))
 			.willReturn(Arrays
-				.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.COMMERCIAL)));
+				.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.ENTERPRISE)));
 		given(this.releases.findAllOfTypeInPeriod(Type.OSS, format.parse(start), format.parse(end))).willReturn(
 				Arrays.asList(new Release("Spring Boot", "3.3.1", "2024-06-01", Status.CLOSED, null, Type.OSS)));
 		this.mvc.perform(MockMvcRequestBuilders.get("/releases?type=commercial&start=2024-06-01&end=2024-06-02"))
 			.andExpect(MockMvcResultMatchers.content()
-				.json("[{\"allDay\":true,\"backgroundColor\":\"#6db33f\",\"start\":\"2024-06-01\",\"title\":\"Spring Boot 2.7.21 (Commercial)\"}]"));
+				.json("[{\"allDay\":true,\"backgroundColor\":\"#6db33f\",\"start\":\"2024-06-01\",\"title\":\"Spring Boot 2.7.21 (Enterprise)\"}]"));
+		this.mvc.perform(MockMvcRequestBuilders.get("/releases?type=oss&start=2024-06-01&end=2024-06-02"))
+			.andExpect(MockMvcResultMatchers.content()
+				.json("[{\"allDay\":true,\"backgroundColor\":\"#6db33f\",\"start\":\"2024-06-01\",\"title\":\"Spring Boot 3.3.1\"}]"));
+	}
+
+	@Test
+	void whenReleasesWithEnterpriseTypeIsCalledThenEnterpriseReleasesInPeriodAreReturned() throws Exception {
+		String start = "2024-06-01";
+		String end = "2024-06-02";
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		given(this.releases.findAllOfTypeInPeriod(Type.ENTERPRISE, format.parse(start), format.parse(end)))
+			.willReturn(Arrays
+				.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.ENTERPRISE)));
+		given(this.releases.findAllOfTypeInPeriod(Type.OSS, format.parse(start), format.parse(end))).willReturn(
+				Arrays.asList(new Release("Spring Boot", "3.3.1", "2024-06-01", Status.CLOSED, null, Type.OSS)));
+		this.mvc.perform(MockMvcRequestBuilders.get("/releases?type=enterprise&start=2024-06-01&end=2024-06-02"))
+			.andExpect(MockMvcResultMatchers.content()
+				.json("[{\"allDay\":true,\"backgroundColor\":\"#6db33f\",\"start\":\"2024-06-01\",\"title\":\"Spring Boot 2.7.21 (Enterprise)\"}]"));
 		this.mvc.perform(MockMvcRequestBuilders.get("/releases?type=oss&start=2024-06-01&end=2024-06-02"))
 			.andExpect(MockMvcResultMatchers.content()
 				.json("[{\"allDay\":true,\"backgroundColor\":\"#6db33f\",\"start\":\"2024-06-01\",\"title\":\"Spring Boot 3.3.1\"}]"));

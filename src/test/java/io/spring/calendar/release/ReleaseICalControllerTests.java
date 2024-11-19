@@ -68,7 +68,7 @@ class ReleaseICalControllerTests {
 	@Test
 	void givenSomeReleasesWhenIcalIsCalledThenSingleCalendarIsReturnedWithOneEventPerRelease() throws Exception {
 		given(this.releases.findAllOfType(null)).willReturn(
-				Arrays.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.COMMERCIAL),
+				Arrays.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.ENTERPRISE),
 						new Release("Spring Boot", "3.3.1", "2024-06-01", Status.CLOSED, null, Type.OSS)));
 		List<ICalendar> calendars = calendars("/ical");
 		assertThat(calendars).singleElement().satisfies((calendar) -> {
@@ -78,14 +78,27 @@ class ReleaseICalControllerTests {
 	}
 
 	@Test
-	void givenSomeReleasesWhenIcalIsCalledWithCommercialThenSingleCalendarIsReturnedWithOneEventPerCommercialRelease()
+	void givenSomeReleasesWhenIcalIsCalledWithCommercialThenSingleCalendarIsReturnedWithOneEventPerEnterpriseRelease()
 			throws Exception {
-		given(this.releases.findAllOfType(Type.COMMERCIAL)).willReturn(Arrays
-			.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.COMMERCIAL)));
+		given(this.releases.findAllOfType(Type.ENTERPRISE)).willReturn(Arrays
+			.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.ENTERPRISE)));
 		List<ICalendar> calendars = calendars("/ical?type=commercial");
 		assertThat(calendars).singleElement().satisfies((calendar) -> {
 			assertThat(calendar.getExperimentalProperty("X-WR-CALNAME").getValue())
-				.isEqualTo("Spring Commercial Releases");
+				.isEqualTo("Spring Enterprise Releases");
+			assertThat(calendar.getEvents()).hasSize(1);
+		});
+	}
+
+	@Test
+	void givenSomeReleasesWhenIcalIsCalledWithEnterpriseThenSingleCalendarIsReturnedWithOneEventPerEnterpriseRelease()
+			throws Exception {
+		given(this.releases.findAllOfType(Type.ENTERPRISE)).willReturn(Arrays
+			.asList(new Release("Spring Boot", "2.7.21", "2024-06-01", Status.CLOSED, null, Type.ENTERPRISE)));
+		List<ICalendar> calendars = calendars("/ical?type=enterprise");
+		assertThat(calendars).singleElement().satisfies((calendar) -> {
+			assertThat(calendar.getExperimentalProperty("X-WR-CALNAME").getValue())
+				.isEqualTo("Spring Enterprise Releases");
 			assertThat(calendar.getEvents()).hasSize(1);
 		});
 	}
