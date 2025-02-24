@@ -178,10 +178,10 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 
 		private URL urlFor(Milestone milestone) {
 			try {
-				if (this.repository.getName().endsWith(COMMERCIAL_REPOSITORY_NAME_SUFFIX)) {
+				if (isCommercial()) {
 					String url = "https://enterprise.spring.io/projects/" + this.commercialProjectId;
 					if (milestone.getState() == State.CLOSED) {
-						url = url + "/changelog/" + milestone.getTitle();
+						url = url + "/" + milestone.getTitle();
 					}
 					return new URL(url);
 				}
