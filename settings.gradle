@@ -1,6 +1,6 @@
 pluginManagement {
 	plugins {
-		id 'org.springframework.boot' version '3.3.5'
+		id 'org.springframework.boot' version '3.4.3'
 		id 'io.spring.javaformat' version "$javaFormatVersion"
 	}
 	repositories {
