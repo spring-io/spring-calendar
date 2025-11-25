@@ -26,7 +26,7 @@ jobs:
         run: ./gradlew build
 
       - name: Set up Azure
-        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # 2.3.0
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_SPRING_ASA }}
 
