@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.function.Supplier;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -61,7 +61,7 @@ class GitHubTemplate implements GitHubOperations {
 		this.rest = restTemplateBuilder.additionalCustomizers((restTemplate) -> {
 			restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
 				@Override
-				public void handleError(ClientHttpResponse response) throws IOException {
+				public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
 					if (response.getStatusCode() == HttpStatus.FORBIDDEN
 							&& response.getHeaders().getFirst("X-RateLimit-Remaining").equals("0")) {
 						throw new IllegalStateException("Rate limit exceeded. Limit will reset at "

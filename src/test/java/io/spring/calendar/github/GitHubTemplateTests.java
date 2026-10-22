@@ -24,16 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.spring.calendar.github.GitHubTemplateTests.TemplateConfiguration;
 import io.spring.calendar.test.TestMethodResponseCreator;
 import io.spring.calendar.test.TestMethodResponseTestExecutionListener;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.boot.restclient.test.autoconfigure.RestClientTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -143,24 +142,25 @@ class GitHubTemplateTests {
 	}
 
 	@Test
-	void requestIsNotConditionalWhenEarlierContentFilledThePage() throws JsonProcessingException {
+	void requestIsNotConditionalWhenEarlierContentFilledThePage() {
 		String originalUrl = "https://api.github.com/repos/spring-projects/spring-boot/milestones?state=all&per_page=100";
 		this.server.expect(requestTo(originalUrl))
-			.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
+			.andRespond(withSuccess().body(JsonMapper.shared().writeValueAsString(createMilestones(100)))
 				.contentType(MediaType.APPLICATION_JSON));
 		this.server.expect(requestTo(originalUrl))
 			.andExpect(missingHeader("If-None-Match"))
-			.andRespond(withSuccess().body(new ObjectMapper().writeValueAsString(createMilestones(100)))
+			.andRespond(withSuccess().body(JsonMapper.shared().writeValueAsString(createMilestones(100)))
 				.contentType(MediaType.APPLICATION_JSON));
 		Page<Milestone> firstPage = this.gitHub.getMilestones(this.repository, null);
 		this.gitHub.getMilestones(this.repository, firstPage);
 		this.server.verify();
 	}
 
-	private List<Map<String, String>> createMilestones(int count) {
-		List<Map<String, String>> milestones = new ArrayList<>();
+	private List<Map<String, Object>> createMilestones(int count) {
+		List<Map<String, Object>> milestones = new ArrayList<>();
 		for (int i = 0; i < count; i++) {
-			Map<String, String> milestone = new HashMap<>();
+			Map<String, Object> milestone = new HashMap<>();
+			milestone.put("number", i);
 			milestones.add(milestone);
 		}
 		return milestones;
