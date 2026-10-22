@@ -23,6 +23,7 @@ import java.util.List;
 import io.spring.calendar.github.GitHubProperties.Organization;
 import io.spring.calendar.github.Milestone.State;
 import io.spring.calendar.github.Repository.Visibility;
+import io.spring.calendar.release.Release.Status;
 import io.spring.calendar.release.ReleaseSchedule;
 import org.junit.jupiter.api.Test;
 
@@ -117,6 +118,70 @@ class GitHubReleaseScheduleSourceTests {
 		assertThat(releaseSchedules).singleElement().satisfies((schedule) -> {
 			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
 			assertThat(schedule.getReleases()).hasSize(1);
+		});
+	}
+
+	@Test
+	void whenAMilestoneIsOpenReleaseStatusIsOpen() {
+		Repository springBoot = repository("spring-projects", "spring-boot");
+		given(this.gitHub.getRepositories("spring-projects", null)).willReturn(page(springBoot));
+		given(this.gitHub.getMilestones(springBoot, null))
+			.willReturn(page(new Milestone("3.3.1", ZonedDateTime.now(), State.OPEN, 1)));
+		List<ReleaseSchedule> releaseSchedules = this.source.get();
+		assertThat(releaseSchedules).hasSize(1);
+		assertThat(releaseSchedules).first().satisfies((schedule) -> {
+			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
+			assertThat(schedule.getReleases()).hasSize(1);
+			assertThat(schedule.getReleases()).first()
+				.satisfies((release) -> assertThat(release.getStatus()).isEqualTo(Status.OPEN));
+		});
+	}
+
+	@Test
+	void whenAMilestoneIsClosedAndDueDateIsInTheFutureReleaseStatusIsOpen() {
+		Repository springBoot = repository("spring-projects", "spring-boot");
+		given(this.gitHub.getRepositories("spring-projects", null)).willReturn(page(springBoot));
+		given(this.gitHub.getMilestones(springBoot, null))
+			.willReturn(page(new Milestone("3.3.1", ZonedDateTime.now().plusDays(1), State.CLOSED, 1)));
+		List<ReleaseSchedule> releaseSchedules = this.source.get();
+		assertThat(releaseSchedules).hasSize(1);
+		assertThat(releaseSchedules).first().satisfies((schedule) -> {
+			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
+			assertThat(schedule.getReleases()).hasSize(1);
+			assertThat(schedule.getReleases()).first()
+				.satisfies((release) -> assertThat(release.getStatus()).isEqualTo(Status.OPEN));
+		});
+	}
+
+	@Test
+	void whenAMilestoneIsClosedAndDueDateIsTodayReleaseStatusIsClosed() {
+		Repository springBoot = repository("spring-projects", "spring-boot");
+		given(this.gitHub.getRepositories("spring-projects", null)).willReturn(page(springBoot));
+		given(this.gitHub.getMilestones(springBoot, null))
+			.willReturn(page(new Milestone("3.3.1", ZonedDateTime.now(), State.CLOSED, 1)));
+		List<ReleaseSchedule> releaseSchedules = this.source.get();
+		assertThat(releaseSchedules).hasSize(1);
+		assertThat(releaseSchedules).first().satisfies((schedule) -> {
+			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
+			assertThat(schedule.getReleases()).hasSize(1);
+			assertThat(schedule.getReleases()).first()
+				.satisfies((release) -> assertThat(release.getStatus()).isEqualTo(Status.CLOSED));
+		});
+	}
+
+	@Test
+	void whenAMilestoneIsClosedAndDueDateIsInThePastReleaseStatusIsClosed() {
+		Repository springBoot = repository("spring-projects", "spring-boot");
+		given(this.gitHub.getRepositories("spring-projects", null)).willReturn(page(springBoot));
+		given(this.gitHub.getMilestones(springBoot, null))
+			.willReturn(page(new Milestone("3.3.1", ZonedDateTime.now().minusDays(3), State.CLOSED, 1)));
+		List<ReleaseSchedule> releaseSchedules = this.source.get();
+		assertThat(releaseSchedules).hasSize(1);
+		assertThat(releaseSchedules).first().satisfies((schedule) -> {
+			assertThat(schedule.getProject()).isEqualTo("Spring Boot");
+			assertThat(schedule.getReleases()).hasSize(1);
+			assertThat(schedule.getReleases()).first()
+				.satisfies((release) -> assertThat(release.getStatus()).isEqualTo(Status.CLOSED));
 		});
 	}
 

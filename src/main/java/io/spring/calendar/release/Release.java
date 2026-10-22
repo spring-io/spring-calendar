@@ -57,41 +57,37 @@ public class Release {
 		this.type = type;
 	}
 
-	String getProject() {
+	public String getProject() {
 		return this.project;
 	}
 
-	String getDate() {
+	public String getDate() {
 		return this.date;
 	}
 
-	Status getStatus() {
+	public Status getStatus() {
 		return this.status;
 	}
 
-	boolean isOverdue() {
+	public boolean isOverdue() {
 		return this.status == Status.OPEN
 				&& LocalDate.now(ZoneId.of("Europe/London")).isAfter(LocalDate.parse(this.date));
 	}
 
-	URL getUrl() {
+	public URL getUrl() {
 		return this.url;
 	}
 
-	Type getType() {
+	public Type getType() {
 		return this.type;
 	}
 
-	String getDescription() {
+	public String getDescription() {
 		String description = this.project + " " + this.name;
 		if (this.type == Type.ENTERPRISE) {
 			description = description + " (Enterprise)";
 		}
 		return description;
-	}
-
-	Release withProject(String project) {
-		return new Release(project, this.name, this.date, this.status, this.url, this.type);
 	}
 
 	/**

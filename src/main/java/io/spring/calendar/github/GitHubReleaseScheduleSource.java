@@ -19,6 +19,7 @@ package io.spring.calendar.github;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -124,7 +125,13 @@ class GitHubReleaseScheduleSource implements ReleaseScheduleSource {
 	}
 
 	private Status getStatus(Milestone milestone) {
-		return (milestone.getState() == State.OPEN) ? Status.OPEN : Status.CLOSED;
+		if (milestone.getState() == State.CLOSED) {
+			LocalDate dueDate = milestone.getDueOn().withZoneSameInstant(ZoneId.of("Europe/London")).toLocalDate();
+			if (!dueDate.isAfter(LocalDate.now())) {
+				return Status.CLOSED;
+			}
+		}
+		return Status.OPEN;
 	}
 
 	private Type getType(Project project) {
