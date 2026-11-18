@@ -39,4 +39,5 @@ jobs:
             --name calendar \
             --service spring-asa \
             --resource-group spring-asa \
-            --artifact-path build/libs/spring-calendar.jar
+            --artifact-path build/libs/spring-calendar.jar \
+            --jvm-options="-XX:-UseBASE64Intrinsics"
